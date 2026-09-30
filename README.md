@@ -4,7 +4,7 @@
 
 ## 构建与使用
 
-1. 用 Android Studio 打开此目录，安装 Android SDK 35，并使用 JDK 17 或更高版本。也可以运行 `gradlew.bat assembleDebug`。
+1. 在 Codex 中打开此目录，让它检查并配置 JDK 17、Android SDK 35，然后构建 APK。Android Studio 可选；命令行构建命令是 `gradlew.bat assembleDebug`。
 2. 安装 `app/build/outputs/apk/debug/app-debug.apk` 到 Android 8.0 或更高版本的手机。
 3. 在应用里输入自己的 `wrk-...` WeRead API Key，点击「保存并同步」。电脑上的环境变量不会自动传到手机。
 4. 长按手机桌面空白处，在组件列表中添加「拾句 · 微信读书划线」。
@@ -23,12 +23,10 @@
 
 ## 两台电脑继续开发
 
-项目已使用 Git。把 `main` 推送到自己的私有远程仓库后，在另一台电脑 `git clone <仓库地址>`，并用 Android Studio 打开克隆的目录。每次换电脑前先提交并推送：
+项目远程仓库为 `https://github.com/zk1047740032/WeNotes.git`。在家第一次使用 Codex 时，可以直接说：
 
-```powershell
-git add .
-git commit -m "描述本次修改"
-git push
-```
+> 请把这个 GitHub 仓库克隆到本机，作为本地项目打开，检查并配置 Android 构建环境，构建一次 APK。以后这个项目请帮我修改代码、验证结果，并在我要求同步时提交和推送。
 
-换到另一台电脑时，先运行 `git pull --rebase`，再继续开发。构建产物、本机 SDK 路径、源码压缩包和签名文件都不提交。两台电脑默认的 Android 调试签名不同；如果要直接覆盖安装同一部手机上的调试版，需要使用相同签名，否则卸载旧调试版后重装并重新同步。
+以后在任一电脑开工时说「先拉取 `main` 最新代码，再按我的需求修改并构建」；换电脑前说「检查改动，提交并推送到 `main`」。Git 负责同步代码，Codex 负责操作 Git 和构建工具。两台电脑都要有各自的本地仓库；聊天记录不会自动把本地源码复制到另一台电脑。
+
+构建产物、本机 SDK 路径、源码压缩包和签名文件都不提交。两台电脑默认的 Android 调试签名不同；如果要直接覆盖安装同一部手机上的调试版，需要使用相同签名，否则卸载旧调试版后重装并重新同步。
