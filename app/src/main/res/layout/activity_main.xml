@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    android:fillViewport="true">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="24dp">
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:text="拾句"
+            android:textColor="#244D3E"
+            android:textSize="38sp"
+            android:textStyle="bold" />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="让读过的句子，在桌面与你重逢。"
+            android:textColor="#69756D"
+            android:textSize="15sp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="30dp"
+            android:background="@drawable/card_background"
+            android:orientation="vertical"
+            android:padding="20dp">
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="连接微信读书"
+                android:textColor="#24362F"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="输入你的 WeRead API Key。密钥仅保存在本机，用于读取你自己的划线。"
+                android:textColor="#6C746D"
+                android:textSize="13sp" />
+            <EditText
+                android:id="@+id/api_key"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="14dp"
+                android:hint="wrk-xxxxxxxx"
+                android:inputType="textPassword|textNoSuggestions"
+                android:singleLine="true"
+                android:textSize="15sp" />
+            <Button
+                android:id="@+id/save_sync"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginTop="12dp"
+                android:background="@drawable/button_background"
+                android:text="保存并同步"
+                android:textAllCaps="false"
+                android:textColor="#FFFFFF" />
+            <TextView
+                android:id="@+id/key_status"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:textColor="#6C746D"
+                android:textSize="12sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="18dp"
+            android:background="@drawable/card_background"
+            android:orientation="vertical"
+            android:padding="20dp">
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="此刻的一句"
+                android:textColor="#24362F"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+            <TextView
+                android:id="@+id/current_quote"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:text="同步后，这里会显示你的划线。"
+                android:textColor="#24362F"
+                android:textSize="17sp" />
+            <TextView
+                android:id="@+id/current_thought"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:textColor="#69756D"
+                android:textSize="14sp"
+                android:visibility="gone" />
+            <TextView
+                android:id="@+id/current_book"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:textColor="#69756D"
+                android:textSize="13sp" />
+            <Button
+                android:id="@+id/next_quote"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:text="换一句"
+                android:textAllCaps="false" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/sync_status"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="18dp"
+            android:textColor="#6C746D"
+            android:textSize="13sp" />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="18dp"
+            android:text="使用方法：保存密钥并同步后，长按手机桌面空白处，添加“拾句 · 微信读书划线”组件。组件约每 30 分钟换一句，每 6 小时尝试同步；系统可能延后执行。"
+            android:textColor="#69756D"
+            android:textSize="13sp" />
+        <Button
+            android:id="@+id/clear_data"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="18dp"
+            android:text="清除密钥和本地划线"
+            android:textAllCaps="false" />
+    </LinearLayout>
+</ScrollView>

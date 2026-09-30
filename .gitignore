@@ -1,0 +1,11 @@
+.gradle/
+.idea/
+build/
+app/build/
+local.properties
+*.iml
+*.apk
+/WeNotes-source-*.zip
+*.jks
+*.keystore
+.env
