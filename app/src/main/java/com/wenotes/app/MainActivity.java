@@ -29,6 +29,7 @@ public final class MainActivity extends Activity {
     protected void onCreate(Bundle state) {
         super.onCreate(state);
         setContentView(R.layout.activity_main);
+        AppNavigation.bind(this, 0);
         moduleSorter = new HomeModuleSorter(this);
         quoteView = findViewById(R.id.current_quote);
         thoughtView = findViewById(R.id.current_thought);

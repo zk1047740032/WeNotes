@@ -1,161 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/home_scroll"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:fitsSystemWindows="true"
-    android:fillViewport="true">
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="24dp">
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
-            android:text="拾句"
-            android:textColor="@color/primary_dark"
-            android:textSize="38sp"
-            android:textStyle="bold" />
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:text="让读过的句子，在桌面与你重逢。"
-            android:textColor="@color/text_secondary"
-            android:textSize="15sp" />
-
-        <LinearLayout
-            android:id="@+id/home_modules"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
-
-            <LinearLayout
-                android:id="@+id/module_shelf"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="18dp"
-                android:background="@drawable/card_background"
-                android:orientation="vertical"
-                android:padding="20dp">
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:drawableEnd="@drawable/ic_drag_handle"
-                    android:drawablePadding="12dp"
-                    android:text="@string/my_shelf"
-                    android:textColor="@color/text_primary"
-                    android:textSize="18sp"
-                    android:textStyle="bold" />
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:text="@string/shelf_description"
-                    android:textColor="@color/text_secondary"
-                    android:textSize="13sp" />
-                <Button
-                    android:id="@+id/open_shelf"
-                    android:layout_width="match_parent"
-                    android:layout_height="48dp"
-                    android:layout_marginTop="16dp"
-                    android:background="@drawable/button_background"
-                    android:backgroundTint="@null"
-                    android:text="@string/open_shelf"
-                    android:textAllCaps="false"
-                    android:textColor="@color/button_text" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/module_connection"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="18dp"
-                android:background="@drawable/card_background"
-                android:orientation="vertical"
-                android:padding="20dp">
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:drawableEnd="@drawable/ic_drag_handle"
-                    android:drawablePadding="12dp"
-                    android:text="@string/connection_title"
-                    android:textColor="@color/text_primary"
-                    android:textSize="18sp"
-                    android:textStyle="bold" />
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:text="@string/connection_description"
-                    android:textColor="@color/text_secondary"
-                    android:textSize="13sp" />
-                <Button
-                    android:id="@+id/open_connection"
-                    android:layout_width="match_parent"
-                    android:layout_height="48dp"
-                    android:layout_marginTop="16dp"
-                    android:background="@drawable/button_background"
-                    android:backgroundTint="@null"
-                    android:text="@string/open_connection"
-                    android:textAllCaps="false"
-                    android:textColor="@color/button_text" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/module_quote"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="18dp"
-                android:background="@drawable/card_background"
-                android:orientation="vertical"
-                android:padding="20dp">
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:drawableEnd="@drawable/ic_drag_handle"
-                    android:drawablePadding="12dp"
-                    android:text="@string/current_quote_title"
-                    android:textColor="@color/text_primary"
-                    android:textSize="18sp"
-                    android:textStyle="bold" />
-                <TextView
-                    android:id="@+id/current_quote"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
-                    android:text="同步后，这里会显示你的划线。"
-                    android:textColor="@color/text_primary"
-                    android:textSize="17sp" />
-                <TextView
-                    android:id="@+id/current_thought"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:textColor="@color/text_secondary"
-                    android:textSize="14sp"
-                    android:visibility="gone" />
-                <TextView
-                    android:id="@+id/current_book"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
-                    android:textColor="@color/text_secondary"
-                    android:textSize="13sp" />
-                <Button
-                    android:id="@+id/next_quote"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
-                    android:background="@drawable/secondary_button_background"
-                    android:backgroundTint="@null"
-                    android:textColor="@color/primary_dark"
-                    android:text="换一句"
-                    android:textAllCaps="false" />
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent" android:layout_height="match_parent" android:orientation="vertical" android:fitsSystemWindows="true">
+    <ScrollView android:id="@+id/home_scroll" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:fillViewport="true" android:scrollbars="none">
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="20dp">
+            <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="16dp" android:text="@string/home_title" android:textColor="@color/text_primary" android:textSize="28sp" android:textStyle="bold" />
+            <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:text="@string/home_subtitle" android:textColor="@color/text_secondary" android:textSize="13sp" />
+            <LinearLayout android:id="@+id/home_modules" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="14dp" android:orientation="vertical">
+                <LinearLayout android:id="@+id/module_shelf" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="14dp" android:background="@drawable/card_background" android:orientation="vertical" android:padding="18dp">
+                    <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:drawableEnd="@drawable/ic_drag_handle" android:text="@string/my_shelf" android:textColor="@color/text_primary" android:textSize="18sp" android:textStyle="bold" />
+                    <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="10dp" android:text="@string/shelf_description" android:textColor="@color/text_secondary" android:textSize="13sp" android:lineSpacingExtra="3dp" />
+                    <Button android:id="@+id/open_shelf" style="@style/TextAction" android:layout_width="wrap_content" android:layout_height="48dp" android:layout_gravity="end" android:layout_marginTop="6dp" android:text="@string/open_shelf" />
+                </LinearLayout>
+                <LinearLayout android:id="@+id/module_connection" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="14dp" android:background="@drawable/card_background" android:orientation="vertical" android:padding="18dp">
+                    <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:drawableEnd="@drawable/ic_drag_handle" android:text="@string/connection_title" android:textColor="@color/text_primary" android:textSize="18sp" android:textStyle="bold" />
+                    <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="10dp" android:text="@string/connection_description" android:textColor="@color/text_secondary" android:textSize="13sp" />
+                    <Button android:id="@+id/open_connection" style="@style/TextAction" android:layout_width="wrap_content" android:layout_height="48dp" android:layout_gravity="end" android:layout_marginTop="6dp" android:text="@string/open_connection" />
+                </LinearLayout>
+                <LinearLayout android:id="@+id/module_quote" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="14dp" android:background="@drawable/card_background" android:orientation="vertical" android:padding="18dp">
+                    <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:drawableEnd="@drawable/ic_drag_handle" android:text="@string/current_quote_title" android:textColor="@color/text_primary" android:textSize="18sp" android:textStyle="bold" />
+                    <TextView android:id="@+id/current_quote" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="18dp" android:textColor="@color/text_primary" android:textSize="18sp" android:lineSpacingExtra="7dp" />
+                    <TextView android:id="@+id/current_thought" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="12dp" android:textColor="@color/text_secondary" android:textSize="13sp" android:lineSpacingExtra="4dp" android:visibility="gone" />
+                    <TextView android:id="@+id/current_book" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="16dp" android:textColor="@color/text_secondary" android:textSize="12sp" />
+                    <Button android:id="@+id/next_quote" style="@style/TextAction" android:layout_width="wrap_content" android:layout_height="48dp" android:layout_gravity="end" android:layout_marginTop="6dp" android:text="@string/next_quote" />
+                </LinearLayout>
             </LinearLayout>
         </LinearLayout>
-
-    </LinearLayout>
-</ScrollView>
+    </ScrollView>
+    <include layout="@layout/bottom_navigation" />
+</LinearLayout>

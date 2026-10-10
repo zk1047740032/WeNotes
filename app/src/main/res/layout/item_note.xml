@@ -2,22 +2,31 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical">
     <TextView android:id="@+id/note_chapter" android:layout_width="match_parent" android:layout_height="wrap_content"
-        android:paddingTop="8dp" android:paddingBottom="12dp" android:textSize="16sp"
-        android:textStyle="bold" android:textColor="@color/primary_dark" />
+        android:paddingTop="12dp" android:paddingBottom="4dp" android:textSize="14sp"
+        android:textStyle="bold" android:textColor="@color/text_primary" />
     <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
-        android:background="@drawable/card_background" android:orientation="vertical" android:padding="18dp">
-        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal">
+        android:orientation="vertical" android:paddingTop="8dp" android:paddingBottom="16dp">
+        <TextView android:id="@+id/note_book" android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp" android:visibility="gone" android:textSize="14sp"
+            android:textColor="@color/text_secondary" />
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal"
+            android:gravity="center_vertical">
             <TextView android:id="@+id/note_kind" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
-                android:textSize="12sp" android:textStyle="bold" android:textColor="@color/primary" />
+                android:textSize="11sp" android:textColor="@color/text_secondary" />
             <TextView android:id="@+id/note_date" android:layout_width="wrap_content" android:layout_height="wrap_content"
-                android:textSize="12sp" android:textColor="@color/text_hint" />
+                android:textSize="11sp" android:textColor="@color/text_hint" />
+            <ImageButton android:id="@+id/note_favorite" android:layout_width="48dp" android:layout_height="48dp"
+                android:layout_marginStart="8dp" android:padding="12dp" android:focusable="false"
+                android:background="?android:attr/selectableItemBackgroundBorderless"
+                android:contentDescription="@string/favorite_note" android:src="@drawable/ic_book_favorite_outline" />
         </LinearLayout>
         <TextView android:id="@+id/note_quote" android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:layout_marginTop="12dp" android:lineSpacingExtra="4dp" android:textSize="16sp"
+            android:layout_marginTop="6dp" android:lineSpacingExtra="6dp" android:textSize="17sp"
             android:textColor="@color/text_primary" android:textIsSelectable="true" />
         <TextView android:id="@+id/note_content" android:layout_width="match_parent" android:layout_height="wrap_content"
             android:layout_marginTop="12dp" android:padding="12dp" android:background="@drawable/secondary_button_background"
-            android:lineSpacingExtra="4dp" android:textSize="15sp" android:textColor="@color/primary_dark"
+            android:lineSpacingExtra="5dp" android:textSize="15sp" android:textColor="@color/text_primary"
             android:textIsSelectable="true" />
     </LinearLayout>
+    <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/outline" />
 </LinearLayout>

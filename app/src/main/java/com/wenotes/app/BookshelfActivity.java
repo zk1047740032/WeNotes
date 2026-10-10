@@ -11,7 +11,8 @@ import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.ListView;
+import android.widget.GridView;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -29,6 +30,7 @@ public final class BookshelfActivity extends LibraryActivity {
     private final BookAdapter adapter = new BookAdapter();
     private int selectedTab;
     private FavoriteStore favoriteStore;
+    private CoverLoader coverLoader;
     private Map<String, ShelfBook> favoriteBooks = new LinkedHashMap<>();
     private final Map<String, ShelfBook> cachedBooks = new LinkedHashMap<>();
     private EditText search;
@@ -39,12 +41,16 @@ public final class BookshelfActivity extends LibraryActivity {
     protected void onCreate(Bundle state) {
         super.onCreate(state);
         setContentView(R.layout.activity_bookshelf);
-        selectedTab = state == null ? SHELF : state.getInt("selected_tab", SHELF);
+        selectedTab = state == null ? getIntent().getBooleanExtra("show_favorites", false) ? FAVORITES : SHELF
+                : state.getInt("selected_tab", SHELF);
         favoriteStore = new FavoriteStore(this);
+        coverLoader = new CoverLoader(this);
         search = findViewById(R.id.book_search);
         summary = findViewById(R.id.shelf_summary);
         empty = findViewById(R.id.library_empty);
-        ListView list = findViewById(R.id.book_list);
+        GridView list = findViewById(R.id.book_list);
+        list.setNumColumns(getResources().getConfiguration().screenWidthDp >= 600 ? 4 : 3);
+        AppNavigation.bind(this, selectedTab == FAVORITES ? 2 : 1);
         list.setAdapter(adapter);
         list.setEmptyView(empty);
         list.setOnItemClickListener((parent, view, position, id) -> {
@@ -57,6 +63,8 @@ public final class BookshelfActivity extends LibraryActivity {
         findViewById(R.id.shelf_tab).setOnClickListener(view -> selectTab(SHELF));
         findViewById(R.id.notebooks_tab).setOnClickListener(view -> selectTab(NOTEBOOKS));
         findViewById(R.id.favorites_tab).setOnClickListener(view -> selectTab(FAVORITES));
+        findViewById(R.id.open_favorite_notes).setOnClickListener(view ->
+                startActivity(new Intent(this, BookNotesActivity.class).putExtra("favorite_notes", true)));
         search.addTextChangedListener(new TextWatcher() {
             @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
             @Override public void onTextChanged(CharSequence s, int start, int before, int count) { showLibrary(); }
@@ -69,6 +77,21 @@ public final class BookshelfActivity extends LibraryActivity {
         state.putInt("selected_tab", selectedTab);
         super.onSaveInstanceState(state);
     }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        setIntent(intent);
+        openFavorites(intent.getBooleanExtra("show_favorites", false));
+    }
+
+    @Override
+    protected void onDestroy() {
+        coverLoader.dispose();
+        super.onDestroy();
+    }
+
+    void openFavorites(boolean favorites) { selectTab(favorites ? FAVORITES : SHELF); }
 
     @Override
     protected void showLibrary() {
@@ -109,8 +132,11 @@ public final class BookshelfActivity extends LibraryActivity {
         styleTab(shelfTab, selectedTab == SHELF);
         styleTab(notesTab, selectedTab == NOTEBOOKS);
         styleTab(findViewById(R.id.favorites_tab), selectedTab == FAVORITES);
+        AppNavigation.bind(this, selectedTab == FAVORITES ? 2 : 1);
+        coverLoader.loadMissing(snapshot.books, adapter::notifyDataSetChanged);
+        findViewById(R.id.open_favorite_notes).setVisibility(selectedTab == FAVORITES ? View.VISIBLE : View.GONE);
         TextView hint = findViewById(R.id.library_hint);
-        hint.setVisibility(selectedTab == FAVORITES ? View.GONE : View.VISIBLE);
+        hint.setVisibility(selectedTab == FAVORITES || snapshot.complete ? View.GONE : View.VISIBLE);
         hint.setText(snapshot.complete ? R.string.library_hint : R.string.legacy_library_hint);
         adapter.notifyDataSetChanged();
     }
@@ -118,12 +144,12 @@ public final class BookshelfActivity extends LibraryActivity {
     private void selectTab(int tab) {
         selectedTab = tab;
         showLibrary();
-        ((ListView) findViewById(R.id.book_list)).setSelection(0);
+        ((GridView) findViewById(R.id.book_list)).setSelection(0);
     }
 
     private void styleTab(Button button, boolean selected) {
-        button.setBackgroundResource(selected ? R.drawable.button_background : R.drawable.secondary_button_background);
-        button.setTextColor(getColor(selected ? R.color.surface : R.color.primary_dark));
+        button.setBackgroundResource(selected ? R.drawable.tab_selected_background : R.drawable.text_button_background);
+        button.setTextColor(getColor(selected ? R.color.primary : R.color.text_secondary));
     }
 
     private final class BookAdapter extends BaseAdapter {
@@ -136,9 +162,9 @@ public final class BookshelfActivity extends LibraryActivity {
             View view = convertView == null
                     ? LayoutInflater.from(BookshelfActivity.this).inflate(R.layout.item_book, parent, false) : convertView;
             ShelfBook book = getItem(position);
-            ((TextView) view.findViewById(R.id.book_badge)).setText("album".equals(book.kind)
-                    ? getString(R.string.audio_badge) : "articles".equals(book.kind)
-                    ? getString(R.string.articles_badge) : book.title.isEmpty() ? "书" : book.title.substring(0, book.title.offsetByCodePoints(0, 1)));
+            TextView placeholder = view.findViewById(R.id.book_badge);
+            placeholder.setText(book.title);
+            coverLoader.bind((ImageView) view.findViewById(R.id.book_cover), placeholder, book);
             ((TextView) view.findViewById(R.id.book_title)).setText(book.title);
             TextView author = view.findViewById(R.id.book_author);
             author.setText(book.author);
@@ -146,7 +172,7 @@ public final class BookshelfActivity extends LibraryActivity {
             String detail = !cachedBooks.containsKey(book.id) ? getString(R.string.book_not_cached)
                     : "album".equals(book.kind) ? getString(R.string.audio_unavailable)
                     : "articles".equals(book.kind) ? getString(R.string.articles_unavailable)
-                    : getString(R.string.book_note_counts, book.highlightCount, book.reviewCount, book.bookmarkCount);
+                    : getString(R.string.shelf_grid_notes, book.noteCount());
             ((TextView) view.findViewById(R.id.book_detail)).setText(detail);
             ImageButton favorite = view.findViewById(R.id.book_favorite);
             boolean saved = favoriteBooks.containsKey(book.id);

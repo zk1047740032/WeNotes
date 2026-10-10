@@ -8,6 +8,7 @@ final class ShelfBook {
     final String title;
     final String author;
     final String kind;
+    final String cover;
     final boolean onShelf;
     final int highlightCount;
     final int reviewCount;
@@ -15,10 +16,16 @@ final class ShelfBook {
 
     ShelfBook(String id, String title, String author, String kind, boolean onShelf,
               int highlightCount, int reviewCount, int bookmarkCount) {
+        this(id, title, author, kind, onShelf, highlightCount, reviewCount, bookmarkCount, "");
+    }
+
+    ShelfBook(String id, String title, String author, String kind, boolean onShelf,
+              int highlightCount, int reviewCount, int bookmarkCount, String cover) {
         this.id = id;
         this.title = title;
         this.author = author;
         this.kind = kind;
+        this.cover = cover;
         this.onShelf = onShelf;
         this.highlightCount = highlightCount;
         this.reviewCount = reviewCount;
@@ -33,18 +40,19 @@ final class ShelfBook {
         JSONObject info = entry.optJSONObject("book");
         return new ShelfBook(id, info == null ? title : info.optString("title", title),
                 info == null ? author : info.optString("author", author), kind, onShelf,
-                entry.optInt("noteCount"), entry.optInt("reviewCount"), entry.optInt("bookmarkCount"));
+                entry.optInt("noteCount"), entry.optInt("reviewCount"), entry.optInt("bookmarkCount"),
+                info == null ? cover : info.optString("cover", cover));
     }
 
     JSONObject toJson() throws JSONException {
         return new JSONObject().put("id", id).put("title", title).put("author", author)
                 .put("kind", kind).put("onShelf", onShelf).put("highlightCount", highlightCount)
-                .put("reviewCount", reviewCount).put("bookmarkCount", bookmarkCount);
+                .put("reviewCount", reviewCount).put("bookmarkCount", bookmarkCount).put("cover", cover);
     }
 
     static ShelfBook fromJson(JSONObject json) {
         return new ShelfBook(json.optString("id"), json.optString("title", "未知书籍"),
                 json.optString("author"), json.optString("kind", "book"), json.optBoolean("onShelf"),
-                json.optInt("highlightCount"), json.optInt("reviewCount"), json.optInt("bookmarkCount"));
+                json.optInt("highlightCount"), json.optInt("reviewCount"), json.optInt("bookmarkCount"), json.optString("cover"));
     }
 }

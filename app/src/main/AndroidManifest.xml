@@ -22,7 +22,8 @@
         </activity>
         <activity android:name=".BookshelfActivity" android:exported="false"
             android:windowSoftInputMode="adjustResize" />
-        <activity android:name=".BookNotesActivity" android:exported="false" />
+        <activity android:name=".BookNotesActivity" android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
         <activity android:name=".ConnectionActivity" android:exported="false"
             android:windowSoftInputMode="adjustResize" />
 

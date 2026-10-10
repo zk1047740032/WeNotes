@@ -29,6 +29,7 @@ public final class ConnectionActivity extends Activity {
     protected void onCreate(Bundle state) {
         super.onCreate(state);
         setContentView(R.layout.activity_connection);
+        AppNavigation.bind(this, 3);
         keyField = findViewById(R.id.api_key);
         keyStatus = findViewById(R.id.key_status);
         syncStatus = findViewById(R.id.sync_status);

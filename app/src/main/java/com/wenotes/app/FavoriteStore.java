@@ -47,7 +47,7 @@ final class FavoriteStore {
                     // Preserve identity and title if a later sync removes the book from the shelf.
                     // Note counts always come from the current snapshot rather than stale metadata.
                     array.put(new JSONObject().put("id", favorite.id).put("title", favorite.title)
-                            .put("author", favorite.author).put("kind", favorite.kind));
+                            .put("author", favorite.author).put("kind", favorite.kind).put("cover", favorite.cover));
                 }
                 prefs.edit().putString("books", array.toString()).apply();
             } catch (JSONException error) {

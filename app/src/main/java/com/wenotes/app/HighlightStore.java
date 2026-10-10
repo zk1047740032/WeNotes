@@ -117,6 +117,8 @@ final class HighlightStore {
             long nextGeneration = generation() + 1;
             new AtomicFile(new File(context.getFilesDir(), FILE_NAME)).delete();
             new FavoriteStore(context).clear();
+            new NoteFavoriteStore(context).clear();
+            CoverLoader.clear(context);
             prefs.edit().clear().putLong("generation", nextGeneration).apply();
         }
     }
