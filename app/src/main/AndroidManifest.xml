@@ -20,6 +20,11 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".BookshelfActivity" android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+        <activity android:name=".BookNotesActivity" android:exported="false" />
+        <activity android:name=".ConnectionActivity" android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
 
         <receiver
             android:name=".HighlightWidgetProvider"

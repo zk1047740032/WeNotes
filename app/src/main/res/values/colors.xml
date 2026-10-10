@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="primary">#2563EB</color>
+    <color name="primary_dark">#1E40AF</color>
+    <color name="background">#F3F7FF</color>
+    <color name="surface">#FFFFFF</color>
+    <color name="surface_tint">#EAF2FF</color>
+    <color name="outline">#D6E4FA</color>
+    <color name="text_primary">#172B4D</color>
+    <color name="text_secondary">#526784</color>
+    <color name="text_hint">#64748B</color>
+    <color name="primary_disabled">#D6E4FA</color>
+    <color name="on_primary_disabled">#526784</color>
+    <color name="ripple_primary">#33FFFFFF</color>
+    <color name="ripple_secondary">#242563EB</color>
+</resources>

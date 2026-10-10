@@ -22,4 +22,7 @@ android {
 
 dependencies {
     implementation 'androidx.work:work-runtime:2.12.0'
+    testImplementation 'junit:junit:4.13.2'
+    // Use Android's JSON behavior in JVM tests (including duplicate-key handling).
+    testImplementation 'com.vaadin.external.google:android-json:0.0.20131108.vaadin1'
 }

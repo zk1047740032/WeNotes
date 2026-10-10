@@ -4,12 +4,13 @@ import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 
-final class WeReadApi {
+final class WeReadApi implements LibrarySync.Api {
     private static final String URL_STRING = "https://i.weread.qq.com/api/agent/gateway";
     private static final String SKILL_VERSION = "1.0.4";
     private final String key;
@@ -18,7 +19,19 @@ final class WeReadApi {
         this.key = key;
     }
 
-    JSONObject call(String name, JSONObject parameters) throws Exception {
+    @Override
+    public JSONObject call(String name, JSONObject parameters) throws Exception {
+        for (int attempt = 0; ; attempt++) {
+            try {
+                return callOnce(name, parameters);
+            } catch (IOException error) {
+                if (attempt == 2 || Thread.currentThread().isInterrupted()) throw error;
+                Thread.sleep(400L * (attempt + 1));
+            }
+        }
+    }
+
+    private JSONObject callOnce(String name, JSONObject parameters) throws Exception {
         JSONObject body = new JSONObject();
         body.put("api_name", name);
         body.put("skill_version", SKILL_VERSION);

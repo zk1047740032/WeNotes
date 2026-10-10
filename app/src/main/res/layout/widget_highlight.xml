@@ -17,14 +17,14 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="拾句  ·  微信读书"
-            android:textColor="#3A6858"
+            android:textColor="@color/primary"
             android:textSize="12sp"
             android:textStyle="bold" />
         <TextView
             android:id="@+id/widget_count"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="#8A8F86"
+            android:textColor="@color/text_hint"
             android:textSize="11sp" />
     </LinearLayout>
 
@@ -37,7 +37,7 @@
         android:gravity="center_vertical"
         android:maxLines="6"
         android:text="把喜欢的句子留在桌面。"
-        android:textColor="#24362F"
+        android:textColor="@color/text_primary"
         android:textSize="17sp" />
 
     <TextView
@@ -47,7 +47,7 @@
         android:ellipsize="end"
         android:maxLines="2"
         android:paddingBottom="6dp"
-        android:textColor="#6C746D"
+        android:textColor="@color/text_secondary"
         android:textSize="12sp"
         android:visibility="gone" />
 
@@ -63,7 +63,7 @@
             android:layout_weight="1"
             android:ellipsize="end"
             android:maxLines="1"
-            android:textColor="#777D74"
+            android:textColor="@color/text_secondary"
             android:textSize="12sp" />
         <TextView
             android:id="@+id/widget_next"
@@ -71,7 +71,7 @@
             android:layout_height="36dp"
             android:gravity="center"
             android:text="下一条  ›"
-            android:textColor="#3A6858"
+            android:textColor="@color/primary"
             android:textSize="12sp"
             android:textStyle="bold" />
     </LinearLayout>

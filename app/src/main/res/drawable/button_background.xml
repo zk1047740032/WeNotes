@@ -1,5 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
-<shape xmlns:android="http://schemas.android.com/apk/res/android">
-    <solid android:color="#3A6858" />
-    <corners android:radius="14dp" />
-</shape>
+<ripple xmlns:android="http://schemas.android.com/apk/res/android"
+    android:color="@color/ripple_primary">
+    <item>
+        <selector>
+            <item android:state_enabled="false">
+                <shape>
+                    <solid android:color="@color/primary_disabled" />
+                    <corners android:radius="14dp" />
+                </shape>
+            </item>
+            <item>
+                <shape>
+                    <solid android:color="@color/primary" />
+                    <corners android:radius="14dp" />
+                </shape>
+            </item>
+        </selector>
+    </item>
+</ripple>

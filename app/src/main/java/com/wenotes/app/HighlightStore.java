@@ -4,20 +4,19 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.AtomicFile;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
+import org.json.JSONTokener;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.List;
 
 final class HighlightStore {
     private static final String FILE_NAME = "highlights.json";
     private static final String PREFS = "highlight_state";
+    private static final Object LOCK = new Object();
     private final Context context;
     private final SharedPreferences prefs;
 
@@ -26,41 +25,47 @@ final class HighlightStore {
         this.prefs = this.context.getSharedPreferences(PREFS, Context.MODE_PRIVATE);
     }
 
-    synchronized List<Highlight> read() {
-        List<Highlight> result = new ArrayList<>();
-        AtomicFile file = new AtomicFile(new File(context.getFilesDir(), FILE_NAME));
-        if (!file.getBaseFile().exists()) return result;
-        try (FileInputStream input = file.openRead(); ByteArrayOutputStream bytes = new ByteArrayOutputStream()) {
-            byte[] buffer = new byte[8192];
-            int n;
-            while ((n = input.read(buffer)) != -1) bytes.write(buffer, 0, n);
-            JSONArray array = new JSONArray(bytes.toString(StandardCharsets.UTF_8.name()));
-            for (int i = 0; i < array.length(); i++) {
-                JSONObject item = array.optJSONObject(i);
-                if (item != null) result.add(Highlight.fromJson(item));
-            }
-        } catch (Exception ignored) {
-            // Leave the widget in its empty state if the cache cannot be read.
-        }
-        return result;
+    List<Highlight> read() {
+        return readLibrary().highlights;
     }
 
-    synchronized void replace(List<Highlight> highlights) throws Exception {
-        JSONArray array = new JSONArray();
-        for (Highlight highlight : highlights) array.put(highlight.toJson());
-        AtomicFile file = new AtomicFile(new File(context.getFilesDir(), FILE_NAME));
-        FileOutputStream output = null;
-        try {
-            output = file.startWrite();
-            output.write(array.toString().getBytes(StandardCharsets.UTF_8));
-            file.finishWrite(output);
-        } catch (Exception error) {
-            if (output != null) file.failWrite(output);
-            throw error;
+    LibrarySnapshot readLibrary() {
+        synchronized (LOCK) {
+            AtomicFile file = new AtomicFile(new File(context.getFilesDir(), FILE_NAME));
+            if (!file.getBaseFile().exists()) return LibrarySnapshot.empty();
+            try (FileInputStream input = file.openRead(); ByteArrayOutputStream bytes = new ByteArrayOutputStream()) {
+                byte[] buffer = new byte[8192];
+                int n;
+                while ((n = input.read(buffer)) != -1) bytes.write(buffer, 0, n);
+                return LibrarySnapshot.fromJson(new JSONTokener(
+                        bytes.toString(StandardCharsets.UTF_8.name())).nextValue());
+            } catch (Exception ignored) {
+                // Leave the widget in its empty state if the cache cannot be read.
+            }
+            return LibrarySnapshot.empty();
         }
-        int current = prefs.getInt("index", 0);
-        prefs.edit().putInt("index", highlights.isEmpty() ? 0 : Math.min(current, highlights.size() - 1))
-                .putLong("last_sync", System.currentTimeMillis()).apply();
+    }
+
+    boolean replace(LibrarySnapshot snapshot, long generation) throws Exception {
+        byte[] bytes = snapshot.toJson().toString().getBytes(StandardCharsets.UTF_8);
+        synchronized (LOCK) {
+            if (generation != generation()) return false;
+            AtomicFile file = new AtomicFile(new File(context.getFilesDir(), FILE_NAME));
+            FileOutputStream output = null;
+            try {
+                output = file.startWrite();
+                output.write(bytes);
+                file.finishWrite(output);
+            } catch (Exception error) {
+                if (output != null) file.failWrite(output);
+                throw error;
+            }
+            int current = prefs.getInt("index", 0);
+            List<Highlight> highlights = snapshot.highlights;
+            prefs.edit().putInt("index", highlights.isEmpty() ? 0 : Math.min(current, highlights.size() - 1))
+                    .putLong("last_sync", System.currentTimeMillis()).apply();
+            return true;
+        }
     }
 
     int index(int size) {
@@ -89,6 +94,16 @@ final class HighlightStore {
         prefs.edit().putString("status", message).apply();
     }
 
+    void setStatus(String message, long generation) {
+        synchronized (LOCK) {
+            if (generation == generation()) setStatus(message);
+        }
+    }
+
+    long generation() {
+        return prefs.getLong("generation", 0L);
+    }
+
     String status() {
         return prefs.getString("status", "尚未同步");
     }
@@ -97,8 +112,11 @@ final class HighlightStore {
         return prefs.getLong("last_sync", 0L);
     }
 
-    synchronized void clear() {
-        new AtomicFile(new File(context.getFilesDir(), FILE_NAME)).delete();
-        prefs.edit().clear().apply();
+    void clear() {
+        synchronized (LOCK) {
+            long nextGeneration = generation() + 1;
+            new AtomicFile(new File(context.getFilesDir(), FILE_NAME)).delete();
+            prefs.edit().clear().putLong("generation", nextGeneration).apply();
+        }
     }
 }
