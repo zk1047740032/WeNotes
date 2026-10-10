@@ -26,14 +26,6 @@
             android:textColor="@color/text_secondary"
             android:textSize="15sp" />
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:text="@string/home_reorder_hint"
-            android:textColor="@color/text_hint"
-            android:textSize="12sp" />
-
         <LinearLayout
             android:id="@+id/home_modules"
             android:layout_width="match_parent"
@@ -165,12 +157,5 @@
             </LinearLayout>
         </LinearLayout>
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="18dp"
-            android:text="使用方法：保存密钥并同步后，长按手机桌面空白处，添加“拾句 · 微信读书划线”组件。组件约每 30 分钟换一句，每 6 小时尝试同步；系统可能延后执行。"
-            android:textColor="@color/text_secondary"
-            android:textSize="13sp" />
     </LinearLayout>
 </ScrollView>

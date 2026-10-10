@@ -10,17 +10,27 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 public final class BookshelfActivity extends LibraryActivity {
+    private static final int SHELF = 0;
+    private static final int NOTEBOOKS = 1;
+    private static final int FAVORITES = 2;
     private final List<ShelfBook> visibleBooks = new ArrayList<>();
     private final BookAdapter adapter = new BookAdapter();
-    private boolean notebooks;
+    private int selectedTab;
+    private FavoriteStore favoriteStore;
+    private Map<String, ShelfBook> favoriteBooks = new LinkedHashMap<>();
+    private final Map<String, ShelfBook> cachedBooks = new LinkedHashMap<>();
     private EditText search;
     private TextView summary;
     private TextView empty;
@@ -29,7 +39,8 @@ public final class BookshelfActivity extends LibraryActivity {
     protected void onCreate(Bundle state) {
         super.onCreate(state);
         setContentView(R.layout.activity_bookshelf);
-        notebooks = state != null && state.getBoolean("notebooks");
+        selectedTab = state == null ? SHELF : state.getInt("selected_tab", SHELF);
+        favoriteStore = new FavoriteStore(this);
         search = findViewById(R.id.book_search);
         summary = findViewById(R.id.shelf_summary);
         empty = findViewById(R.id.library_empty);
@@ -43,8 +54,9 @@ public final class BookshelfActivity extends LibraryActivity {
         });
         findViewById(R.id.library_back).setOnClickListener(view -> finish());
         findViewById(R.id.library_refresh).setOnClickListener(view -> sync());
-        findViewById(R.id.shelf_tab).setOnClickListener(view -> { notebooks = false; showLibrary(); });
-        findViewById(R.id.notebooks_tab).setOnClickListener(view -> { notebooks = true; showLibrary(); });
+        findViewById(R.id.shelf_tab).setOnClickListener(view -> selectTab(SHELF));
+        findViewById(R.id.notebooks_tab).setOnClickListener(view -> selectTab(NOTEBOOKS));
+        findViewById(R.id.favorites_tab).setOnClickListener(view -> selectTab(FAVORITES));
         search.addTextChangedListener(new TextWatcher() {
             @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
             @Override public void onTextChanged(CharSequence s, int start, int before, int count) { showLibrary(); }
@@ -54,37 +66,59 @@ public final class BookshelfActivity extends LibraryActivity {
 
     @Override
     protected void onSaveInstanceState(Bundle state) {
-        state.putBoolean("notebooks", notebooks);
+        state.putInt("selected_tab", selectedTab);
         super.onSaveInstanceState(state);
     }
 
     @Override
     protected void showLibrary() {
         String query = search.getText().toString().trim().toLowerCase(Locale.ROOT);
+        favoriteBooks = favoriteStore.read();
+        cachedBooks.clear();
+        for (ShelfBook book : snapshot.books) cachedBooks.put(book.id, book);
+        List<ShelfBook> candidates = snapshot.books;
+        if (selectedTab == FAVORITES) {
+            candidates = new ArrayList<>();
+            for (ShelfBook favorite : favoriteBooks.values()) {
+                candidates.add(cachedBooks.getOrDefault(favorite.id, favorite));
+            }
+        }
         visibleBooks.clear();
         int total = 0;
-        for (ShelfBook book : snapshot.books) {
-            if (notebooks ? book.noteCount() == 0 : !book.onShelf) continue;
+        for (ShelfBook book : candidates) {
+            if (selectedTab == SHELF && !book.onShelf
+                    || selectedTab == NOTEBOOKS && book.noteCount() == 0) continue;
             total++;
             if (query.isEmpty() || (book.title + " " + book.author).toLowerCase(Locale.ROOT).contains(query)) {
                 visibleBooks.add(book);
             }
         }
-        String count = getString(notebooks ? R.string.notebooks_total : R.string.shelf_total, total);
+        String count = getString(selectedTab == FAVORITES ? R.string.favorites_total
+                : selectedTab == NOTEBOOKS ? R.string.notebooks_total : R.string.shelf_total, total);
         summary.setText(query.isEmpty() ? count : getString(R.string.filtered_count, count, visibleBooks.size()));
-        if (!snapshot.complete) {
+        if (selectedTab == FAVORITES) {
+            empty.setText(query.isEmpty() ? R.string.empty_favorites : R.string.no_matching_books);
+        } else if (!snapshot.complete) {
             empty.setText(new SecretStore(this).hasKey() ? R.string.sync_library_first : R.string.connect_first);
         } else {
             empty.setText(!query.isEmpty() ? R.string.no_matching_books
-                    : notebooks ? R.string.no_notebooks : R.string.empty_shelf);
+                    : selectedTab == NOTEBOOKS ? R.string.no_notebooks : R.string.empty_shelf);
         }
         Button shelfTab = findViewById(R.id.shelf_tab);
         Button notesTab = findViewById(R.id.notebooks_tab);
-        styleTab(shelfTab, !notebooks);
-        styleTab(notesTab, notebooks);
+        styleTab(shelfTab, selectedTab == SHELF);
+        styleTab(notesTab, selectedTab == NOTEBOOKS);
+        styleTab(findViewById(R.id.favorites_tab), selectedTab == FAVORITES);
         TextView hint = findViewById(R.id.library_hint);
+        hint.setVisibility(selectedTab == FAVORITES ? View.GONE : View.VISIBLE);
         hint.setText(snapshot.complete ? R.string.library_hint : R.string.legacy_library_hint);
         adapter.notifyDataSetChanged();
+    }
+
+    private void selectTab(int tab) {
+        selectedTab = tab;
+        showLibrary();
+        ((ListView) findViewById(R.id.book_list)).setSelection(0);
     }
 
     private void styleTab(Button button, boolean selected) {
@@ -109,10 +143,25 @@ public final class BookshelfActivity extends LibraryActivity {
             TextView author = view.findViewById(R.id.book_author);
             author.setText(book.author);
             author.setVisibility(book.author.isEmpty() ? View.GONE : View.VISIBLE);
-            String detail = "album".equals(book.kind) ? getString(R.string.audio_unavailable)
+            String detail = !cachedBooks.containsKey(book.id) ? getString(R.string.book_not_cached)
+                    : "album".equals(book.kind) ? getString(R.string.audio_unavailable)
                     : "articles".equals(book.kind) ? getString(R.string.articles_unavailable)
                     : getString(R.string.book_note_counts, book.highlightCount, book.reviewCount, book.bookmarkCount);
             ((TextView) view.findViewById(R.id.book_detail)).setText(detail);
+            ImageButton favorite = view.findViewById(R.id.book_favorite);
+            boolean saved = favoriteBooks.containsKey(book.id);
+            favorite.setVisibility("articles".equals(book.kind) || book.id.isEmpty() ? View.GONE : View.VISIBLE);
+            favorite.setImageResource(saved ? R.drawable.ic_book_favorite : R.drawable.ic_book_favorite_outline);
+            favorite.setContentDescription(getString(saved ? R.string.unfavorite_book_description
+                    : R.string.favorite_book_description, book.title));
+            favorite.setOnClickListener(button -> {
+                try {
+                    favoriteStore.toggle(book);
+                    showLibrary();
+                } catch (IllegalStateException error) {
+                    Toast.makeText(BookshelfActivity.this, R.string.favorite_save_failed, Toast.LENGTH_SHORT).show();
+                }
+            });
             return view;
         }
     }

@@ -116,6 +116,7 @@ final class HighlightStore {
         synchronized (LOCK) {
             long nextGeneration = generation() + 1;
             new AtomicFile(new File(context.getFilesDir(), FILE_NAME)).delete();
+            new FavoriteStore(context).clear();
             prefs.edit().clear().putLong("generation", nextGeneration).apply();
         }
     }
