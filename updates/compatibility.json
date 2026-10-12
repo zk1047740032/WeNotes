@@ -1,0 +1,17 @@
+{
+  "schema": 1,
+  "revision": 1,
+  "app": {
+    "versionCode": 2,
+    "versionName": "1.1.0",
+    "updateUrl": "https://github.com/zk1047740032/WeNotes/releases"
+  },
+  "profiles": [
+    {
+      "skillVersion": "1.0.5",
+      "adapter": "weread-library-v1",
+      "minAppVersionCode": 2,
+      "pageSize": 100
+    }
+  ]
+}
