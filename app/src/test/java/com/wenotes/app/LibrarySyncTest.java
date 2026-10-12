@@ -22,6 +22,59 @@ public class LibrarySyncTest {
     }
 
     @Test
+    public void shelfReadsReadingAndListeningTimesInsteadOfContentUpdateTimes() throws Exception {
+        java.util.Map<String, ShelfBook> books = LibrarySync.readShelf(json("{\"books\":["
+                + "{\"bookId\":\"read\",\"readUpdateTime\":1791604800,\"updateTime\":1791604900},"
+                + "{\"bookId\":\"unread\",\"updateTime\":1791604900}],\"albums\":["
+                + "{\"albumInfo\":{\"albumId\":\"heard\",\"updateTime\":1791604900},"
+                + "\"albumInfoExtra\":{\"lectureReadUpdateTime\":1791604700}},"
+                + "{\"albumInfo\":{\"albumId\":\"unheard\"}}],\"mp\":{\"title\":\"文章收藏\"}}"));
+        assertEquals(1791604800L, books.get("read").lastReadAt);
+        assertEquals(1791604700L, books.get("album:heard").lastReadAt);
+        assertEquals(0, books.get("unread").lastReadAt);
+        assertEquals(0, books.get("album:unheard").lastReadAt);
+        assertEquals(0, books.get("articles").lastReadAt);
+    }
+
+    @Test
+    public void notebookMergeAndCacheRoundTripPreserveReadingHistory() throws Exception {
+        LibrarySnapshot result = new LibrarySync((name, params) -> {
+            if (name.equals("/shelf/sync")) return json("{\"books\":[{\"bookId\":\"b\",\"readUpdateTime\":1791604800}]}");
+            if (name.equals("/user/notebooks")) return json("{\"books\":["
+                    + "{\"bookId\":\"b\",\"bookmarkCount\":1,\"book\":{\"title\":\"书名\",\"cover\":\"cover-url\"}},"
+                    + "{\"bookId\":\"removed\",\"bookmarkCount\":1,\"sort\":1791604800}]}");
+            throw new AssertionError(name);
+        }, () -> false, message -> { }).fetch();
+        LibrarySnapshot restored = LibrarySnapshot.fromJson(new JSONObject(result.toJson().toString()));
+        assertTrue(restored.recentReadingAvailable);
+        assertEquals(1791604800L, restored.books.get(0).lastReadAt);
+        assertEquals("书名", restored.books.get(0).title);
+        assertEquals("cover-url", restored.books.get(0).cover);
+        assertEquals(1, restored.books.get(0).noteCount());
+        assertEquals(0, restored.books.get(1).lastReadAt);
+    }
+
+    @Test
+    public void previousCompleteCacheRequiresSyncForReadingHistoryButKeepsNotes() throws Exception {
+        LibrarySnapshot original = new LibrarySync((name, params) -> {
+            if (name.equals("/shelf/sync")) return json("{\"books\":[{\"bookId\":\"b\"}]}");
+            if (name.equals("/user/notebooks")) return json("{\"books\":[{\"bookId\":\"b\",\"noteCount\":1}]}");
+            if (name.equals("/book/bookmarklist")) return json("{\"updated\":[{\"bookmarkId\":\"m\",\"markText\":\"原文\"}]}");
+            throw new AssertionError(name);
+        }, () -> false, message -> { }).fetch();
+        JSONObject oldCache = original.toJson().put("version", 2);
+        oldCache.remove("recentReadingAvailable");
+        oldCache.getJSONArray("books").getJSONObject(0).remove("lastReadAt");
+        LibrarySnapshot restored = LibrarySnapshot.fromJson(oldCache);
+        assertTrue(restored.complete);
+        assertFalse(restored.recentReadingAvailable);
+        assertEquals(0, restored.books.get(0).lastReadAt);
+        assertEquals("原文", restored.notes.get(0).quote);
+        assertEquals(1, restored.books.get(0).noteCount());
+        assertFalse(LibrarySnapshot.fromJson(restored.toJson()).recentReadingAvailable);
+    }
+
+    @Test
     public void fetchesAllPagesAndKeepsStandaloneReviewsOutOfWidget() throws Exception {
         List<String> calls = new ArrayList<>();
         LibrarySync.Api api = (name, params) -> {

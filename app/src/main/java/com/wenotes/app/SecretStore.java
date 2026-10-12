@@ -15,21 +15,29 @@ import javax.crypto.SecretKey;
 import javax.crypto.spec.GCMParameterSpec;
 
 final class SecretStore {
-    private static final String ALIAS = "wenotes_api_key";
-    private static final String PREFS = "credentials";
+    private final String alias;
     private final SharedPreferences prefs;
 
     SecretStore(Context context) {
-        prefs = context.getApplicationContext().getSharedPreferences(PREFS, Context.MODE_PRIVATE);
+        this(context, "credentials", "wenotes_api_key");
+    }
+
+    static SecretStore forAi(Context context) {
+        return new SecretStore(context, "ai_credentials", "wenotes_ai_api_key");
+    }
+
+    private SecretStore(Context context, String preferences, String alias) {
+        this.alias = alias;
+        prefs = context.getApplicationContext().getSharedPreferences(preferences, Context.MODE_PRIVATE);
     }
 
     private SecretKey key() throws Exception {
         KeyStore store = KeyStore.getInstance("AndroidKeyStore");
         store.load(null);
-        SecretKey existing = (SecretKey) store.getKey(ALIAS, null);
+        SecretKey existing = (SecretKey) store.getKey(alias, null);
         if (existing != null) return existing;
         KeyGenerator generator = KeyGenerator.getInstance(KeyProperties.KEY_ALGORITHM_AES, "AndroidKeyStore");
-        generator.init(new KeyGenParameterSpec.Builder(ALIAS,
+        generator.init(new KeyGenParameterSpec.Builder(alias,
                 KeyProperties.PURPOSE_ENCRYPT | KeyProperties.PURPOSE_DECRYPT)
                 .setBlockModes(KeyProperties.BLOCK_MODE_GCM)
                 .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_NONE)
@@ -66,6 +74,6 @@ final class SecretStore {
         prefs.edit().clear().commit();
         KeyStore store = KeyStore.getInstance("AndroidKeyStore");
         store.load(null);
-        if (store.containsAlias(ALIAS)) store.deleteEntry(ALIAS);
+        if (store.containsAlias(alias)) store.deleteEntry(alias);
     }
 }

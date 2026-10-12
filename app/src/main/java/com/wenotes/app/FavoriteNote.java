@@ -25,6 +25,19 @@ final class FavoriteNote {
         return note.bookId.length() + ":" + note.bookId + note.id;
     }
 
+    static FavoriteNote fromHighlight(Highlight highlight, LibrarySnapshot snapshot) {
+        for (BookNote note : snapshot.notes) {
+            if (note.id.equals(highlight.id) && note.bookId.equals(highlight.bookId)) {
+                return new FavoriteNote(note, highlight.title, highlight.author);
+            }
+        }
+        long order = highlight.chapterUid == 0 ? Long.MAX_VALUE : highlight.chapterUid;
+        BookNote note = new BookNote(highlight.id, highlight.bookId,
+                highlight.thought.isEmpty() ? "highlight" : "thought", highlight.chapter,
+                order, highlight.text, highlight.thought, highlight.createdAt);
+        return new FavoriteNote(note, highlight.title, highlight.author);
+    }
+
     JSONObject toJson() throws JSONException {
         return new JSONObject().put("note", note.toJson())
                 .put("bookTitle", bookTitle).put("bookAuthor", bookAuthor);

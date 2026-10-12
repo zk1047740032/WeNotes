@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android">
+    <ImageView android:layout_width="32dp" android:layout_height="32dp"
+        android:src="@drawable/ic_quote" android:importantForAccessibility="no" />
+    <TextView android:id="@+id/current_quote" android:layout_width="match_parent"
+        android:layout_height="wrap_content" android:layout_marginTop="12dp" android:minHeight="80dp"
+        android:gravity="center_vertical" android:textColor="@color/text_primary"
+        android:textSize="23sp" android:fontFamily="sans-serif-medium" android:lineSpacingExtra="9dp"
+        android:textIsSelectable="true" />
+    <LinearLayout android:id="@+id/current_thought_panel" android:layout_width="match_parent"
+        android:layout_height="wrap_content" android:layout_marginTop="28dp"
+        android:background="@drawable/secondary_button_background" android:orientation="vertical"
+        android:padding="16dp" android:visibility="gone">
+        <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:text="@string/current_thought_title" android:textColor="@color/primary"
+            android:fontFamily="sans-serif-medium" android:textSize="13sp" />
+        <TextView android:id="@+id/current_thought" android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:layout_marginTop="8dp"
+            android:textColor="@color/text_primary" android:textSize="15sp" android:lineSpacingExtra="6dp"
+            android:textIsSelectable="true" />
+    </LinearLayout>
+    <View android:layout_width="44dp" android:layout_height="1dp"
+        android:layout_marginTop="28dp" android:background="@color/outline" android:importantForAccessibility="no" />
+    <TextView android:id="@+id/current_book" android:layout_width="match_parent"
+        android:layout_height="wrap_content" android:layout_marginTop="14dp"
+        android:textColor="@color/text_secondary" android:textSize="13sp" android:lineSpacingExtra="4dp" />
+</merge>

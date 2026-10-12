@@ -4,7 +4,7 @@
     <item>
         <shape>
             <solid android:color="@color/surface_tint" />
-            <corners android:radius="6dp" />
+            <corners android:radius="14dp" />
         </shape>
     </item>
 </ripple>

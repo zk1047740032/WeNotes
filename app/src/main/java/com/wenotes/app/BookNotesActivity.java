@@ -40,14 +40,15 @@ public final class BookNotesActivity extends LibraryActivity {
         setContentView(R.layout.activity_book_notes);
         bookId = getIntent().getStringExtra("book_id");
         globalFavorites = getIntent().getBooleanExtra("favorite_notes", false);
+        findViewById(R.id.notes_header).setVisibility(globalFavorites ? View.GONE : View.VISIBLE);
         favoritesOnly = globalFavorites || state != null && state.getBoolean("favorites_only");
+        findViewById(R.id.notes_bottom_navigation).setVisibility(globalFavorites ? View.VISIBLE : View.GONE);
+        if (globalFavorites) AppNavigation.bind(this, 2);
         favoriteStore = new NoteFavoriteStore(this);
         search = findViewById(R.id.note_search);
         search.setVisibility(globalFavorites ? View.VISIBLE : View.GONE);
         findViewById(R.id.note_tabs).setVisibility(globalFavorites ? View.GONE : View.VISIBLE);
         findViewById(R.id.notes_book_title).setVisibility(globalFavorites ? View.GONE : View.VISIBLE);
-        ((TextView) findViewById(R.id.notes_page_title)).setText(globalFavorites
-                ? R.string.favorite_notes : R.string.book_notes);
         ((TextView) findViewById(R.id.notes_book_title)).setText(getIntent().getStringExtra("book_title"));
         ListView list = findViewById(R.id.note_list);
         list.setAdapter(adapter);
@@ -82,6 +83,8 @@ public final class BookNotesActivity extends LibraryActivity {
         super.onSaveInstanceState(state);
     }
 
+    boolean isGlobalFavorites() { return globalFavorites; }
+
     private void selectFavorites(boolean selected) {
         favoritesOnly = selected;
         showLibrary();
@@ -89,8 +92,7 @@ public final class BookNotesActivity extends LibraryActivity {
     }
 
     private void styleTab(Button button, boolean selected) {
-        button.setBackgroundResource(selected ? R.drawable.tab_selected_background : R.drawable.text_button_background);
-        button.setTextColor(getColor(selected ? R.color.primary : R.color.text_secondary));
+        AppStyle.select(button, selected);
     }
 
     @Override

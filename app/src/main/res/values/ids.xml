@@ -1,4 +1,0 @@
-<resources>
-    <item name="move_module_up" type="id" />
-    <item name="move_module_down" type="id" />
-</resources>

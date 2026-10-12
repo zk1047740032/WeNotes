@@ -56,4 +56,33 @@ public class FavoriteNoteTest {
         assertEquals("书名", resolved.bookTitle);
         assertEquals("作者", resolved.bookAuthor);
     }
+
+    @Test
+    public void swipedQuoteUsesTheOriginalNoteIdentityAndKind() {
+        Highlight highlight = new Highlight("n", "b", "书名", "作者", "第一章",
+                "原文", "关联想法", "", 1, 123);
+        BookNote original = note("b", "n", "highlight", "原文", "");
+        LibrarySnapshot snapshot = new LibrarySnapshot(new ArrayList<>(), Arrays.asList(
+                note("another-book", "n", "thought", "别的书", ""), original),
+                Arrays.asList(highlight), true);
+        FavoriteNote favorite = FavoriteNote.fromHighlight(highlight, snapshot);
+        assertSame(original, favorite.note);
+        assertEquals(FavoriteNote.key(original), FavoriteNote.key(favorite.note));
+        assertEquals("书名", favorite.bookTitle);
+        assertEquals("作者", favorite.bookAuthor);
+    }
+
+    @Test
+    public void swipedQuoteWithoutMatchingNoteKeepsReadableContent() throws Exception {
+        Highlight highlight = new Highlight("n", "b", "书名", "作者", "第一章",
+                "原文", "自己的想法", "", 0, 123);
+        FavoriteNote favorite = FavoriteNote.fromJson(
+                FavoriteNote.fromHighlight(highlight, LibrarySnapshot.empty()).toJson());
+        assertEquals("n", favorite.note.id);
+        assertEquals("b", favorite.note.bookId);
+        assertEquals("原文", favorite.note.quote);
+        assertEquals("自己的想法", favorite.note.content);
+        assertEquals("thought", favorite.note.kind);
+        assertEquals(Long.MAX_VALUE, favorite.note.chapterOrder);
+    }
 }

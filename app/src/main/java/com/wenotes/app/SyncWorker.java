@@ -57,7 +57,11 @@ public final class SyncWorker extends Worker {
                 store.setStatus("请先在应用内设置 API Key", generation);
                 return Result.failure();
             }
-            LibrarySnapshot snapshot = new LibrarySync(new WeReadApi(key),
+            store.setStatus("正在检查同步适配更新…", generation);
+            ApiUpdateManager updates = new ApiUpdateManager(context);
+            updates.check(false);
+            if (isStopped() || generation != store.generation()) return Result.failure();
+            LibrarySnapshot snapshot = new LibrarySync(new WeReadApi(key, updates),
                     () -> isStopped() || generation != store.generation(),
                     message -> store.setStatus(message, generation)).fetch();
             if (isStopped() || !key.equals(new SecretStore(context).read())

@@ -66,15 +66,19 @@ final class LibrarySync {
             JSONObject book = array.getJSONObject(i);
             String id = book.getString("bookId");
             books.put(id, new ShelfBook(id, book.optString("title", "未知书籍"),
-                    book.optString("author"), "book", true, 0, 0, 0, book.optString("cover")));
+                    book.optString("author"), "book", true, 0, 0, 0, book.optString("cover"),
+                    book.optLong("readUpdateTime")));
         }
         array = page.optJSONArray("albums");
         if (array != null) {
             for (int i = 0; i < array.length(); i++) {
-                JSONObject info = array.getJSONObject(i).getJSONObject("albumInfo");
+                JSONObject album = array.getJSONObject(i);
+                JSONObject info = album.getJSONObject("albumInfo");
+                JSONObject extra = album.optJSONObject("albumInfoExtra");
                 String id = "album:" + info.getString("albumId");
                 books.put(id, new ShelfBook(id, info.optString("name", "有声书"),
-                        info.optString("authorName"), "album", true, 0, 0, 0, info.optString("cover")));
+                        info.optString("authorName"), "album", true, 0, 0, 0, info.optString("cover"),
+                        extra == null ? 0 : extra.optLong("lectureReadUpdateTime")));
             }
         }
         JSONObject mp = page.optJSONObject("mp");

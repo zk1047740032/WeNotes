@@ -74,7 +74,10 @@ final class CoverLoader {
         long generation = store.generation();
         worker.execute(() -> {
             try {
-                JSONObject page = new WeReadApi(new SecretStore(context).read()).call("/shelf/sync", new JSONObject());
+                ApiUpdateManager updates = new ApiUpdateManager(context);
+                updates.check(false);
+                JSONObject page = new WeReadApi(new SecretStore(context).read(), updates)
+                        .call("/shelf/sync", new JSONObject());
                 Map<String, ShelfBook> shelf = LibrarySync.readShelf(page);
                 synchronized (LOCK) {
                     if (generation != store.generation()) return;
@@ -84,8 +87,8 @@ final class CoverLoader {
                 }
                 main.post(() -> { if (!disposed && generation == store.generation()) refreshed.run(); });
             } catch (Exception error) {
-                if (error.getMessage() != null && error.getMessage().startsWith("接口要求更新")) {
-                    store.setStatus(error.getMessage(), generation);
+                if (error instanceof WeReadApi.UpgradeRequiredException) {
+                    store.setStatus("同步失败：" + error.getMessage(), generation);
                 }
                 // Keep the readable book placeholder when offline or the account is unavailable.
             }

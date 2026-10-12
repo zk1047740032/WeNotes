@@ -1,6 +1,6 @@
 <resources>
     <style name="AppTheme.Base" parent="android:style/Theme.Material.Light.NoActionBar">
-        <item name="android:fontFamily">sans</item>
+        <item name="android:fontFamily">sans-serif</item>
         <item name="android:statusBarColor">@color/background</item>
         <item name="android:navigationBarColor">@color/primary_dark</item>
         <item name="android:windowLightStatusBar">true</item>
@@ -26,9 +26,26 @@
         <item name="android:paddingEnd">12dp</item>
     </style>
     <style name="ReadingTab" parent="FlatButton">
-        <item name="android:background">@drawable/text_button_background</item>
-        <item name="android:textColor">@color/text_secondary</item>
+        <item name="android:background">@drawable/reading_tab_background</item>
+        <item name="android:textColor">@color/tab_text</item>
         <item name="android:paddingStart">4dp</item>
         <item name="android:paddingEnd">4dp</item>
+    </style>
+    <style name="PeriodTab" parent="ReadingTab">
+        <item name="android:background">@drawable/segment_background</item>
+        <item name="android:textColor">@color/segment_text</item>
+        <item name="android:textSize">12sp</item>
+    </style>
+    <style name="PageTitle">
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textColor">@color/text_primary</item>
+        <item name="android:textSize">30sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+    <style name="PrimaryAction" parent="FlatButton">
+        <item name="android:background">@drawable/button_background</item>
+        <item name="android:textColor">@color/button_text</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textSize">16sp</item>
     </style>
 </resources>

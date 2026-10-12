@@ -79,7 +79,7 @@ abstract class LibraryActivity extends Activity {
 
     private void showSyncStatus() {
         TextView status = findViewById(R.id.library_sync_status);
-        if (status != null) status.setText(store.status());
+        if (status != null) status.setText(ApiUpdateManager.readableSyncStatus(store.status()));
     }
 
     protected abstract void showLibrary();

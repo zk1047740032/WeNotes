@@ -1,21 +1,51 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:background="@color/surface">
-    <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/outline" />
-    <LinearLayout android:layout_width="match_parent" android:layout_height="64dp" android:orientation="horizontal" android:gravity="center_vertical">
-        <LinearLayout android:id="@+id/nav_home" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:orientation="vertical" android:gravity="center" android:background="@drawable/text_button_background" android:contentDescription="@string/nav_home" android:focusable="true">
-            <ImageView android:id="@+id/nav_home_icon" android:layout_width="26dp" android:layout_height="26dp" android:src="@drawable/ic_nav_home" android:importantForAccessibility="no" />
-            <TextView android:id="@+id/nav_home_label" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="3dp" android:text="@string/nav_home" android:textColor="@color/text_secondary" android:textSize="11sp" android:importantForAccessibility="no" />
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="wrap_content"
+    android:orientation="vertical" android:background="@color/surface">
+    <View android:layout_width="match_parent" android:layout_height="1dp"
+        android:background="@color/outline" android:importantForAccessibility="no" />
+    <LinearLayout android:layout_width="match_parent" android:layout_height="76dp"
+        android:orientation="horizontal" android:gravity="center_vertical" android:baselineAligned="false"
+        android:paddingStart="8dp" android:paddingEnd="8dp">
+        <LinearLayout android:id="@+id/nav_home" android:layout_width="0dp" android:layout_height="match_parent"
+            android:layout_weight="1" android:orientation="vertical" android:gravity="center"
+            android:background="@drawable/text_button_background" android:contentDescription="@string/nav_home" android:focusable="true">
+            <ImageView android:id="@+id/nav_home_icon" android:layout_width="56dp" android:layout_height="34dp"
+                android:paddingStart="15dp" android:paddingEnd="15dp" android:paddingTop="4dp" android:paddingBottom="4dp"
+                android:background="@drawable/nav_icon_background" android:src="@drawable/ic_nav_home" android:importantForAccessibility="no" />
+            <TextView android:id="@+id/nav_home_label" android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:layout_marginTop="4dp" android:text="@string/nav_home" android:textColor="@color/text_secondary"
+                android:textSize="11sp" android:importantForAccessibility="no" />
         </LinearLayout>
-        <LinearLayout android:id="@+id/nav_shelf" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:orientation="vertical" android:gravity="center" android:background="@drawable/text_button_background" android:contentDescription="@string/nav_shelf" android:focusable="true">
-            <ImageView android:id="@+id/nav_shelf_icon" android:layout_width="26dp" android:layout_height="26dp" android:src="@drawable/ic_nav_shelf" android:importantForAccessibility="no" />
-            <TextView android:id="@+id/nav_shelf_label" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="3dp" android:text="@string/nav_shelf" android:textColor="@color/text_secondary" android:textSize="11sp" android:importantForAccessibility="no" />
+        <LinearLayout android:id="@+id/nav_shelf" android:layout_width="0dp" android:layout_height="match_parent"
+            android:layout_weight="1" android:orientation="vertical" android:gravity="center"
+            android:background="@drawable/text_button_background" android:contentDescription="@string/nav_shelf" android:focusable="true">
+            <ImageView android:id="@+id/nav_shelf_icon" android:layout_width="56dp" android:layout_height="34dp"
+                android:paddingStart="15dp" android:paddingEnd="15dp" android:paddingTop="4dp" android:paddingBottom="4dp"
+                android:background="@drawable/nav_icon_background" android:src="@drawable/ic_nav_shelf" android:importantForAccessibility="no" />
+            <TextView android:id="@+id/nav_shelf_label" android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:layout_marginTop="4dp" android:text="@string/nav_shelf" android:textColor="@color/text_secondary"
+                android:textSize="11sp" android:importantForAccessibility="no" />
         </LinearLayout>
-        <LinearLayout android:id="@+id/nav_favorites" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:orientation="vertical" android:gravity="center" android:background="@drawable/text_button_background" android:contentDescription="@string/nav_favorites" android:focusable="true">
-            <ImageView android:id="@+id/nav_favorites_icon" android:layout_width="26dp" android:layout_height="26dp" android:src="@drawable/ic_book_favorite_outline" android:importantForAccessibility="no" />
-            <TextView android:id="@+id/nav_favorites_label" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="3dp" android:text="@string/nav_favorites" android:textColor="@color/text_secondary" android:textSize="11sp" android:importantForAccessibility="no" />
+        <LinearLayout android:id="@+id/nav_favorites" android:layout_width="0dp" android:layout_height="match_parent"
+            android:layout_weight="1" android:orientation="vertical" android:gravity="center"
+            android:background="@drawable/text_button_background" android:contentDescription="@string/nav_favorites" android:focusable="true">
+            <ImageView android:id="@+id/nav_favorites_icon" android:layout_width="56dp" android:layout_height="34dp"
+                android:paddingStart="15dp" android:paddingEnd="15dp" android:paddingTop="4dp" android:paddingBottom="4dp"
+                android:background="@drawable/nav_icon_background" android:src="@drawable/ic_book_favorite_outline" android:importantForAccessibility="no" />
+            <TextView android:id="@+id/nav_favorites_label" android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:layout_marginTop="4dp" android:text="@string/nav_favorites" android:textColor="@color/text_secondary"
+                android:textSize="11sp" android:importantForAccessibility="no" />
         </LinearLayout>
-        <LinearLayout android:id="@+id/nav_connection" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:orientation="vertical" android:gravity="center" android:background="@drawable/text_button_background" android:contentDescription="@string/nav_connection" android:focusable="true">
-            <ImageView android:id="@+id/nav_connection_icon" android:layout_width="26dp" android:layout_height="26dp" android:src="@drawable/ic_nav_connection" android:importantForAccessibility="no" />
-            <TextView android:id="@+id/nav_connection_label" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="3dp" android:text="@string/nav_connection" android:textColor="@color/text_secondary" android:textSize="11sp" android:importantForAccessibility="no" />
+        <LinearLayout android:id="@+id/nav_connection" android:layout_width="0dp" android:layout_height="match_parent"
+            android:layout_weight="1" android:orientation="vertical" android:gravity="center"
+            android:background="@drawable/text_button_background" android:contentDescription="@string/nav_connection" android:focusable="true">
+            <ImageView android:id="@+id/nav_connection_icon" android:layout_width="56dp" android:layout_height="34dp"
+                android:paddingStart="15dp" android:paddingEnd="15dp" android:paddingTop="4dp" android:paddingBottom="4dp"
+                android:background="@drawable/nav_icon_background" android:src="@drawable/ic_nav_connection" android:importantForAccessibility="no" />
+            <TextView android:id="@+id/nav_connection_label" android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:layout_marginTop="4dp" android:text="@string/nav_connection" android:textColor="@color/text_secondary"
+                android:textSize="11sp" android:importantForAccessibility="no" />
         </LinearLayout>
     </LinearLayout>
 </LinearLayout>

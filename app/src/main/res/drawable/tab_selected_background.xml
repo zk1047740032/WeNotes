@@ -1,5 +1,5 @@
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:height="2dp" android:gravity="bottom" android:left="22dp" android:right="22dp">
-        <shape><solid android:color="@color/primary" /><corners android:radius="1dp" /></shape>
+    <item android:height="3dp" android:gravity="bottom" android:left="12dp" android:right="12dp">
+        <shape><solid android:color="@color/primary" /><corners android:radius="2dp" /></shape>
     </item>
 </layer-list>

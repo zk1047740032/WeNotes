@@ -42,13 +42,31 @@ final class NoteFavoriteStore {
             String key = FavoriteNote.key(favorite.note);
             if (notes.containsKey(key)) notes.remove(key);
             else notes.put(key, favorite);
-            try {
-                JSONArray array = new JSONArray();
-                for (FavoriteNote saved : notes.values()) array.put(saved.toJson());
-                prefs.edit().putString("notes", array.toString()).apply();
-            } catch (JSONException error) {
-                throw new IllegalStateException("Unable to save note favorites", error);
-            }
+            write(notes);
+        }
+    }
+
+    boolean add(FavoriteNote favorite) {
+        if (favorite.note.id.isEmpty() || favorite.note.bookId.isEmpty()) {
+            throw new IllegalStateException("Missing note identity");
+        }
+        synchronized (LOCK) {
+            Map<String, FavoriteNote> notes = read();
+            String key = FavoriteNote.key(favorite.note);
+            if (notes.containsKey(key)) return false;
+            notes.put(key, favorite);
+            write(notes);
+            return true;
+        }
+    }
+
+    private void write(Map<String, FavoriteNote> notes) {
+        try {
+            JSONArray array = new JSONArray();
+            for (FavoriteNote saved : notes.values()) array.put(saved.toJson());
+            prefs.edit().putString("notes", array.toString()).apply();
+        } catch (JSONException error) {
+            throw new IllegalStateException("Unable to save note favorites", error);
         }
     }
 

@@ -1,0 +1,4 @@
+<resources>
+    <item type="id" name="action_next_quote" />
+    <item type="id" name="action_favorite_quote" />
+</resources>

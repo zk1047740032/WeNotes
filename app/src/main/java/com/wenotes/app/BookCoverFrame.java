@@ -6,7 +6,10 @@ import android.widget.FrameLayout;
 
 /** Keeps covers in book proportions as grid columns resize. */
 public final class BookCoverFrame extends FrameLayout {
-    public BookCoverFrame(Context context, AttributeSet attributes) { super(context, attributes); }
+    public BookCoverFrame(Context context, AttributeSet attributes) {
+        super(context, attributes);
+        setClipToOutline(true);
+    }
 
     @Override
     protected void onMeasure(int widthSpec, int heightSpec) {

@@ -14,20 +14,32 @@ final class AppNavigation {
         for (int i = 0; i < items.length; i++) {
             final int destination = i;
             int color = activity.getColor(i == selected ? R.color.primary : R.color.text_secondary);
-            ((ImageView) activity.findViewById(icons[i])).setImageTintList(ColorStateList.valueOf(color));
-            ((TextView) activity.findViewById(labels[i])).setTextColor(color);
+            ImageView icon = activity.findViewById(icons[i]);
+            icon.setImageTintList(ColorStateList.valueOf(color));
+            icon.setSelected(i == selected);
+            TextView label = activity.findViewById(labels[i]);
+            label.setTextColor(color);
+            AppStyle.select(label, i == selected);
             activity.findViewById(items[i]).setSelected(i == selected);
             activity.findViewById(items[i]).setOnClickListener(view -> {
-                if ((destination == 1 || destination == 2) && activity instanceof BookshelfActivity) {
-                    ((BookshelfActivity) activity).openFavorites(destination == 2);
+                if (destination == 1 && activity instanceof BookshelfActivity) {
+                    ((BookshelfActivity) activity).openRecent();
                     return;
                 }
                 if (destination == 0 && activity instanceof MainActivity
+                        || destination == 2 && activity instanceof BookNotesActivity
+                        && ((BookNotesActivity) activity).isGlobalFavorites()
                         || destination == 3 && activity instanceof ConnectionActivity) return;
                 Class<?> target = destination == 0 ? MainActivity.class : destination == 3
-                        ? ConnectionActivity.class : BookshelfActivity.class;
-                activity.startActivity(new Intent(activity, target).putExtra("show_favorites", destination == 2)
-                        .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP));
+                        ? ConnectionActivity.class : destination == 2 ? BookNotesActivity.class : BookshelfActivity.class;
+                Intent intent = new Intent(activity, target).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                if (destination == 2) {
+                    // A book's notes may already be on the stack; recreate it in global favorites mode.
+                    intent.putExtra("favorite_notes", true);
+                } else {
+                    intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                }
+                activity.startActivity(intent);
             });
         }
     }

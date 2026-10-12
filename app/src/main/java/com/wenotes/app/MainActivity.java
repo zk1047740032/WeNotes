@@ -2,24 +2,23 @@ package com.wenotes.app;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.Button;
+import android.view.accessibility.AccessibilityNodeInfo;
 import android.widget.TextView;
-
-import java.util.ArrayList;
+import android.widget.Toast;
 import java.util.List;
 
 public final class MainActivity extends Activity {
-    private TextView quoteView;
-    private TextView thoughtView;
-    private TextView bookView;
+    private QuoteCardLayout quoteCard;
+    private QuoteStackLayout quoteStack;
+    private View nextCard;
     private HighlightStore store;
+    private NoteFavoriteStore favoriteStore;
+    private Highlight currentHighlight;
     private SharedPreferences statePrefs;
-    private HomeModuleSorter moduleSorter;
-    private List<Highlight> cachedHighlights = new ArrayList<>();
+    private LibrarySnapshot cachedLibrary = LibrarySnapshot.empty();
     private long loadedSync = -1L;
     private long loadedGeneration = -1L;
     private final SharedPreferences.OnSharedPreferenceChangeListener stateListener =
@@ -29,23 +28,49 @@ public final class MainActivity extends Activity {
     protected void onCreate(Bundle state) {
         super.onCreate(state);
         setContentView(R.layout.activity_main);
+        ApiUpdateManager.checkAsync(this, false, null);
         AppNavigation.bind(this, 0);
-        moduleSorter = new HomeModuleSorter(this);
-        quoteView = findViewById(R.id.current_quote);
-        thoughtView = findViewById(R.id.current_thought);
-        bookView = findViewById(R.id.current_book);
         store = new HighlightStore(this);
+        favoriteStore = new NoteFavoriteStore(this);
         statePrefs = getSharedPreferences("highlight_state", Context.MODE_PRIVATE);
-        Button next = findViewById(R.id.next_quote);
-        next.setOnClickListener(view -> {
-            store.next(store.read().size());
-            HighlightWidgetProvider.renderAll(this);
-            refreshUi();
+        quoteCard = findViewById(R.id.module_quote);
+        quoteStack = findViewById(R.id.quote_stack);
+        nextCard = findViewById(R.id.quote_next_card);
+        ((TextView) nextCard.findViewById(R.id.current_quote)).setTextIsSelectable(false);
+        ((TextView) nextCard.findViewById(R.id.current_thought)).setTextIsSelectable(false);
+        quoteCard.setSwipeListener(new QuoteCardLayout.SwipeListener() {
+            @Override
+            public boolean onBeforeSwipe(boolean left) {
+                return left || favoriteQuote();
+            }
+
+            @Override
+            public void onAdvance() {
+                nextQuote();
+            }
         });
-        findViewById(R.id.open_connection).setOnClickListener(view ->
-                startActivity(new Intent(this, ConnectionActivity.class)));
-        findViewById(R.id.open_shelf).setOnClickListener(view ->
-                startActivity(new Intent(this, BookshelfActivity.class)));
+        quoteCard.setAccessibilityDelegate(new View.AccessibilityDelegate() {
+            @Override
+            public void onInitializeAccessibilityNodeInfo(View host, AccessibilityNodeInfo info) {
+                super.onInitializeAccessibilityNodeInfo(host, info);
+                if (currentHighlight == null) return;
+                info.addAction(new AccessibilityNodeInfo.AccessibilityAction(
+                        R.id.action_next_quote, getString(R.string.next_quote)));
+                info.addAction(new AccessibilityNodeInfo.AccessibilityAction(
+                        R.id.action_favorite_quote, getString(R.string.favorite_quote_and_next)));
+            }
+
+            @Override
+            public boolean performAccessibilityAction(View host, int action, Bundle arguments) {
+                if (currentHighlight != null && action == R.id.action_next_quote) {
+                    return quoteCard.performSwipe(true);
+                }
+                if (currentHighlight != null && action == R.id.action_favorite_quote) {
+                    return quoteCard.performSwipe(false);
+                }
+                return super.performAccessibilityAction(host, action, arguments);
+            }
+        });
         refreshUi();
     }
 
@@ -59,38 +84,71 @@ public final class MainActivity extends Activity {
     @Override
     protected void onStop() {
         statePrefs.unregisterOnSharedPreferenceChangeListener(stateListener);
+        quoteCard.resetSwipe();
         super.onStop();
     }
 
-    @Override
-    protected void onDestroy() {
-        moduleSorter.dispose();
-        super.onDestroy();
+    private void nextQuote() {
+        if (cachedLibrary.highlights.isEmpty()) return;
+        store.next(cachedLibrary.highlights.size());
+        HighlightWidgetProvider.renderAll(this);
+        refreshUi();
+    }
+
+    private boolean favoriteQuote() {
+        if (currentHighlight == null) return false;
+        try {
+            boolean added = favoriteStore.add(FavoriteNote.fromHighlight(currentHighlight, cachedLibrary));
+            Toast.makeText(this, added ? R.string.quote_saved : R.string.quote_already_saved,
+                    Toast.LENGTH_SHORT).show();
+            return true;
+        } catch (IllegalStateException error) {
+            Toast.makeText(this, R.string.favorite_save_failed, Toast.LENGTH_SHORT).show();
+            return false;
+        }
     }
 
     private void refreshUi() {
         long synced = store.lastSync();
         long generation = store.generation();
         if (synced != loadedSync || generation != loadedGeneration) {
-            cachedHighlights = store.read();
+            cachedLibrary = store.readLibrary();
             loadedSync = synced;
             loadedGeneration = generation;
         }
-        List<Highlight> highlights = cachedHighlights;
+        List<Highlight> highlights = cachedLibrary.highlights;
+        quoteCard.setSwipeEnabled(!highlights.isEmpty());
+        quoteStack.setCardCount(highlights.size());
+        currentHighlight = null;
         if (highlights.isEmpty()) {
-            quoteView.setText("同步后，这里会显示你的划线。");
-            thoughtView.setVisibility(View.GONE);
+            bindQuote(quoteCard, null);
+        } else {
+            int index = store.index(highlights.size());
+            currentHighlight = highlights.get(index);
+            bindQuote(quoteCard, currentHighlight);
+            if (highlights.size() > 1) bindQuote(nextCard, highlights.get((index + 1) % highlights.size()));
+        }
+        quoteStack.contentChanged();
+    }
+
+    private void bindQuote(View card, Highlight highlight) {
+        TextView quoteView = card.findViewById(R.id.current_quote);
+        TextView thoughtView = card.findViewById(R.id.current_thought);
+        View thoughtPanel = card.findViewById(R.id.current_thought_panel);
+        TextView bookView = card.findViewById(R.id.current_book);
+        if (highlight == null) {
+            quoteView.setText(R.string.empty_quote);
+            thoughtPanel.setVisibility(View.GONE);
             bookView.setText("");
         } else {
-            Highlight highlight = highlights.get(store.index(highlights.size()));
-            quoteView.setText("“" + highlight.text + "”");
-            bookView.setText("《" + highlight.title + "》"
-                    + (highlight.chapter.isEmpty() ? "" : " · " + highlight.chapter));
+            quoteView.setText(highlight.text);
+            bookView.setText(highlight.chapter.isEmpty() ? getString(R.string.quote_book, highlight.title)
+                    : getString(R.string.quote_book_chapter, highlight.title, highlight.chapter));
             if (highlight.thought.isEmpty()) {
-                thoughtView.setVisibility(View.GONE);
+                thoughtPanel.setVisibility(View.GONE);
             } else {
-                thoughtView.setText("我的想法：" + highlight.thought);
-                thoughtView.setVisibility(View.VISIBLE);
+                thoughtView.setText(highlight.thought);
+                thoughtPanel.setVisibility(View.VISIBLE);
             }
         }
     }

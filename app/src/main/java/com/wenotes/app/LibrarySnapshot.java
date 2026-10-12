@@ -14,13 +14,20 @@ final class LibrarySnapshot {
     final List<BookNote> notes;
     final List<Highlight> highlights;
     final boolean complete;
+    final boolean recentReadingAvailable;
 
     LibrarySnapshot(List<ShelfBook> books, List<BookNote> notes, List<Highlight> highlights,
                     boolean complete) {
+        this(books, notes, highlights, complete, complete);
+    }
+
+    private LibrarySnapshot(List<ShelfBook> books, List<BookNote> notes, List<Highlight> highlights,
+                            boolean complete, boolean recentReadingAvailable) {
         this.books = books;
         this.notes = notes;
         this.highlights = highlights;
         this.complete = complete;
+        this.recentReadingAvailable = recentReadingAvailable;
     }
 
     static LibrarySnapshot empty() {
@@ -34,7 +41,8 @@ final class LibrarySnapshot {
         for (ShelfBook book : books) bookArray.put(book.toJson());
         for (BookNote note : notes) noteArray.put(note.toJson());
         for (Highlight highlight : highlights) highlightArray.put(highlight.toJson());
-        return new JSONObject().put("version", 2).put("complete", complete)
+        return new JSONObject().put("version", 3).put("complete", complete)
+                .put("recentReadingAvailable", recentReadingAvailable)
                 .put("books", bookArray).put("notes", noteArray).put("highlights", highlightArray);
     }
 
@@ -51,7 +59,8 @@ final class LibrarySnapshot {
         for (int i = 0; i < array.length(); i++) notes.add(BookNote.fromJson(array.getJSONObject(i)));
         array = json.getJSONArray("highlights");
         for (int i = 0; i < array.length(); i++) highlights.add(Highlight.fromJson(array.getJSONObject(i)));
-        return new LibrarySnapshot(books, notes, highlights, json.optBoolean("complete"));
+        return new LibrarySnapshot(books, notes, highlights, json.optBoolean("complete"),
+                json.optInt("version") >= 3 && json.optBoolean("recentReadingAvailable"));
     }
 
     private static LibrarySnapshot fromLegacy(JSONArray array) throws JSONException {

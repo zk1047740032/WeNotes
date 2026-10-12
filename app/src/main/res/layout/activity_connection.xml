@@ -1,27 +1,56 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent" android:layout_height="match_parent" android:orientation="vertical" android:fitsSystemWindows="true">
-    <ScrollView android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:fillViewport="true" android:scrollbars="none">
-        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="20dp">
-            <LinearLayout android:layout_width="match_parent" android:layout_height="48dp" android:orientation="horizontal" android:gravity="center_vertical">
-                <Button android:id="@+id/connection_back" style="@style/TextAction" android:layout_width="48dp" android:layout_height="match_parent" android:text="@string/back" android:textColor="@color/text_secondary" android:paddingStart="0dp" android:paddingEnd="8dp" />
-                <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:layout_marginStart="8dp" android:text="@string/connection_title" android:textColor="@color/text_primary" android:textSize="22sp" android:textStyle="bold" />
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:minHeight="48dp" android:layout_marginStart="24dp" android:layout_marginEnd="24dp" android:layout_marginTop="20dp" android:orientation="horizontal">
+        <Button android:id="@+id/weread_tab" style="@style/ReadingTab" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:text="@string/weread_tab" />
+        <Button android:id="@+id/ai_tab" style="@style/ReadingTab" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:text="@string/ai_tab" />
+    </LinearLayout>
+    <FrameLayout android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1">
+        <ScrollView android:id="@+id/weread_panel" android:layout_width="match_parent" android:layout_height="match_parent" android:fillViewport="true" android:scrollbars="none">
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="24dp">
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:background="@drawable/card_background" android:orientation="vertical" android:padding="20dp" android:elevation="1dp">
+                    <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/key_input_title" android:textColor="@color/text_primary" android:textSize="17sp" android:textStyle="bold" />
+                    <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="10dp" android:text="@string/key_input_description" android:textColor="@color/text_secondary" android:textSize="13sp" android:lineSpacingExtra="3dp" />
+                    <EditText android:id="@+id/api_key" android:layout_width="match_parent" android:layout_height="48dp" android:layout_marginTop="18dp" android:paddingStart="14dp" android:paddingEnd="14dp" android:background="@drawable/search_background" android:hint="@string/key_hint" android:inputType="textPassword|textNoSuggestions" android:singleLine="true" android:saveEnabled="false" android:importantForAutofill="no" android:textColor="@color/text_primary" android:textColorHint="@color/text_hint" android:textSize="14sp" />
+                    <Button android:id="@+id/save_sync" style="@style/PrimaryAction" android:layout_width="match_parent" android:layout_height="52dp" android:layout_marginTop="16dp" android:background="@drawable/button_background" android:backgroundTint="@null" android:text="@string/save_and_sync" android:textColor="@color/button_text" />
+                    <TextView android:id="@+id/key_status" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="12dp" android:textColor="@color/text_secondary" android:textSize="11sp" android:lineSpacingExtra="3dp" />
+                </LinearLayout>
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="20dp" android:background="@drawable/card_background" android:orientation="vertical" android:padding="20dp" android:elevation="1dp">
+                    <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/key_help_title" android:textColor="@color/text_primary" android:textSize="17sp" android:textStyle="bold" />
+                    <TextView android:id="@+id/key_help_steps" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="14dp" android:text="@string/key_help_steps" android:lineSpacingExtra="6dp" android:textColor="@color/text_secondary" android:textSize="13sp" />
+                    <Button android:id="@+id/open_key_help" style="@style/TextAction" android:layout_width="wrap_content" android:layout_height="48dp" android:layout_gravity="end" android:layout_marginTop="8dp" android:text="@string/open_key_help" />
+                    <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/key_help_url" android:textIsSelectable="true" android:textColor="@color/text_hint" android:textSize="11sp" />
+                </LinearLayout>
+                <TextView android:id="@+id/sync_status" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="18dp" android:textColor="@color/text_secondary" android:textSize="11sp" android:lineSpacingExtra="4dp" />
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp" android:background="@drawable/card_background"
+                    android:orientation="vertical" android:padding="20dp" android:elevation="1dp">
+                    <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+                        android:text="@string/update_title" android:textColor="@color/text_primary"
+                        android:textSize="17sp" android:textStyle="bold" />
+                    <TextView android:id="@+id/update_status" android:layout_width="match_parent"
+                        android:layout_height="wrap_content" android:layout_marginTop="12dp"
+                        android:textColor="@color/text_secondary" android:textSize="13sp" android:lineSpacingExtra="5dp" />
+                    <Button android:id="@+id/check_updates" style="@style/TextAction" android:layout_width="match_parent"
+                        android:layout_height="48dp" android:layout_marginTop="12dp" android:text="@string/check_updates" />
+                    <Button android:id="@+id/open_app_update" style="@style/PrimaryAction" android:layout_width="match_parent"
+                        android:layout_height="52dp" android:layout_marginTop="8dp"
+                        android:visibility="gone" android:text="@string/open_app_update" />
+                </LinearLayout>
+                <Button android:id="@+id/clear_data" style="@style/TextAction" android:layout_width="match_parent" android:layout_height="48dp" android:layout_marginTop="16dp" android:text="@string/clear_all_data" android:textColor="@color/text_secondary" />
             </LinearLayout>
-            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="20dp" android:background="@drawable/card_background" android:orientation="vertical" android:padding="18dp">
-                <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/key_input_title" android:textColor="@color/text_primary" android:textSize="17sp" android:textStyle="bold" />
-                <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="10dp" android:text="@string/key_input_description" android:textColor="@color/text_secondary" android:textSize="13sp" android:lineSpacingExtra="3dp" />
-                <EditText android:id="@+id/api_key" android:layout_width="match_parent" android:layout_height="48dp" android:layout_marginTop="18dp" android:paddingStart="14dp" android:paddingEnd="14dp" android:background="@drawable/search_background" android:hint="@string/key_hint" android:inputType="textPassword|textNoSuggestions" android:singleLine="true" android:saveEnabled="false" android:importantForAutofill="no" android:textColor="@color/text_primary" android:textColorHint="@color/text_hint" android:textSize="14sp" />
-                <Button android:id="@+id/save_sync" android:layout_width="match_parent" android:layout_height="48dp" android:layout_marginTop="16dp" android:background="@drawable/button_background" android:backgroundTint="@null" android:text="@string/save_and_sync" android:textColor="@color/button_text" />
-                <TextView android:id="@+id/key_status" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="12dp" android:textColor="@color/text_secondary" android:textSize="11sp" android:lineSpacingExtra="3dp" />
+        </ScrollView>
+        <ScrollView android:id="@+id/ai_panel" android:layout_width="match_parent" android:layout_height="match_parent" android:visibility="gone" android:fillViewport="true" android:scrollbars="none">
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="24dp">
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:background="@drawable/card_background" android:orientation="vertical" android:padding="20dp" android:elevation="1dp">
+                    <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/ai_key_title" android:textColor="@color/text_primary" android:textSize="17sp" android:textStyle="bold" />
+                    <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="10dp" android:text="@string/ai_key_description" android:textColor="@color/text_secondary" android:textSize="13sp" android:lineSpacingExtra="3dp" />
+                    <EditText android:id="@+id/ai_api_key" android:layout_width="match_parent" android:layout_height="48dp" android:layout_marginTop="18dp" android:paddingStart="14dp" android:paddingEnd="14dp" android:background="@drawable/search_background" android:hint="@string/ai_key_hint" android:inputType="textPassword|textNoSuggestions" android:singleLine="true" android:saveEnabled="false" android:importantForAutofill="no" android:imeOptions="actionDone" android:textColor="@color/text_primary" android:textColorHint="@color/text_hint" android:textSize="14sp" />
+                    <Button android:id="@+id/save_ai_key" style="@style/PrimaryAction" android:layout_width="match_parent" android:layout_height="52dp" android:layout_marginTop="16dp" android:background="@drawable/button_background" android:backgroundTint="@null" android:text="@string/save_ai_key" android:textColor="@color/button_text" />
+                    <TextView android:id="@+id/ai_key_status" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="12dp" android:textColor="@color/text_secondary" android:textSize="11sp" android:lineSpacingExtra="3dp" />
+                </LinearLayout>
+                <Button android:id="@+id/clear_ai_key" style="@style/TextAction" android:layout_width="match_parent" android:layout_height="48dp" android:layout_marginTop="16dp" android:visibility="gone" android:text="@string/clear_ai_key" android:textColor="@color/text_secondary" />
             </LinearLayout>
-            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="14dp" android:background="@drawable/card_background" android:orientation="vertical" android:padding="18dp">
-                <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/key_help_title" android:textColor="@color/text_primary" android:textSize="17sp" android:textStyle="bold" />
-                <TextView android:id="@+id/key_help_steps" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="14dp" android:text="@string/key_help_steps" android:lineSpacingExtra="6dp" android:textColor="@color/text_secondary" android:textSize="13sp" />
-                <Button android:id="@+id/open_key_help" style="@style/TextAction" android:layout_width="wrap_content" android:layout_height="48dp" android:layout_gravity="end" android:layout_marginTop="8dp" android:text="@string/open_key_help" />
-                <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/key_help_url" android:textIsSelectable="true" android:textColor="@color/text_hint" android:textSize="10sp" />
-            </LinearLayout>
-            <TextView android:id="@+id/sync_status" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="18dp" android:textColor="@color/text_secondary" android:textSize="11sp" android:lineSpacingExtra="4dp" />
-            <Button android:id="@+id/clear_data" style="@style/TextAction" android:layout_width="match_parent" android:layout_height="48dp" android:layout_marginTop="16dp" android:text="@string/clear_all_data" android:textColor="@color/text_secondary" />
-        </LinearLayout>
-    </ScrollView>
+        </ScrollView>
+    </FrameLayout>
     <include layout="@layout/bottom_navigation" />
 </LinearLayout>
