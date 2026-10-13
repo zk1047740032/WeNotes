@@ -1,5 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
 <merge xmlns:android="http://schemas.android.com/apk/res/android">
+    <LinearLayout android:id="@+id/current_book_panel" android:layout_width="match_parent"
+        android:layout_height="wrap_content" android:layout_marginBottom="20dp" android:orientation="vertical">
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:orientation="horizontal" android:gravity="center_vertical" android:baselineAligned="false">
+            <com.wenotes.app.BookCoverFrame android:layout_width="56dp" android:layout_height="wrap_content"
+                android:background="@drawable/cover_background" android:elevation="2dp">
+                <ImageView android:id="@+id/current_cover" android:layout_width="match_parent"
+                    android:layout_height="match_parent" android:scaleType="fitCenter" android:importantForAccessibility="no" />
+                <TextView android:id="@+id/current_cover_placeholder" android:layout_width="match_parent"
+                    android:layout_height="match_parent" android:background="@color/surface_tint"
+                    android:gravity="center" android:padding="8dp" android:textSize="13sp"
+                    android:fontFamily="sans-serif-medium" android:textColor="@color/text_secondary"
+                    android:importantForAccessibility="no" />
+            </com.wenotes.app.BookCoverFrame>
+            <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
+                android:layout_weight="1" android:layout_marginStart="18dp" android:orientation="vertical">
+                <TextView android:id="@+id/current_book" android:layout_width="match_parent"
+                    android:layout_height="wrap_content" android:fontFamily="sans-serif-medium"
+                    android:textColor="@color/text_primary" android:textSize="16sp" android:lineSpacingExtra="4dp" />
+                <TextView android:id="@+id/current_chapter" android:layout_width="match_parent"
+                    android:layout_height="wrap_content" android:layout_marginTop="8dp"
+                    android:textColor="@color/text_secondary" android:textSize="13sp" android:lineSpacingExtra="4dp" />
+            </LinearLayout>
+        </LinearLayout>
+        <View android:layout_width="match_parent" android:layout_height="1dp" android:layout_marginTop="20dp"
+            android:background="@color/outline" android:importantForAccessibility="no" />
+    </LinearLayout>
     <ImageView android:layout_width="32dp" android:layout_height="32dp"
         android:src="@drawable/ic_quote" android:importantForAccessibility="no" />
     <TextView android:id="@+id/current_quote" android:layout_width="match_parent"
@@ -8,7 +35,7 @@
         android:textSize="23sp" android:fontFamily="sans-serif-medium" android:lineSpacingExtra="9dp"
         android:textIsSelectable="true" />
     <LinearLayout android:id="@+id/current_thought_panel" android:layout_width="match_parent"
-        android:layout_height="wrap_content" android:layout_marginTop="28dp"
+        android:layout_height="wrap_content" android:layout_marginTop="24dp"
         android:background="@drawable/secondary_button_background" android:orientation="vertical"
         android:padding="16dp" android:visibility="gone">
         <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
@@ -19,9 +46,4 @@
             android:textColor="@color/text_primary" android:textSize="15sp" android:lineSpacingExtra="6dp"
             android:textIsSelectable="true" />
     </LinearLayout>
-    <View android:layout_width="44dp" android:layout_height="1dp"
-        android:layout_marginTop="28dp" android:background="@color/outline" android:importantForAccessibility="no" />
-    <TextView android:id="@+id/current_book" android:layout_width="match_parent"
-        android:layout_height="wrap_content" android:layout_marginTop="14dp"
-        android:textColor="@color/text_secondary" android:textSize="13sp" android:lineSpacingExtra="4dp" />
 </merge>

@@ -14,6 +14,9 @@ import androidx.work.Worker;
 import androidx.work.WorkerParameters;
 
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.CancellationException;
+import java.time.Instant;
+import java.time.ZoneId;
 
 public final class SyncWorker extends Worker {
     private static final String NOW = "sync_now";
@@ -61,14 +64,29 @@ public final class SyncWorker extends Worker {
             ApiUpdateManager updates = new ApiUpdateManager(context);
             updates.check(false);
             if (isStopped() || generation != store.generation()) return Result.failure();
-            LibrarySnapshot snapshot = new LibrarySync(new WeReadApi(key, updates),
+            WeReadApi api = new WeReadApi(key, updates);
+            LibrarySnapshot snapshot = new LibrarySync(api,
                     () -> isStopped() || generation != store.generation(),
                     message -> store.setStatus(message, generation)).fetch();
+            ReadingStatistics statistics = store.readLibrary().readingStatistics;
+            boolean statisticsUpdated = false;
+            store.setStatus("正在同步本周的阅读统计…", generation);
+            try {
+                statistics = ReadingStatistics.fetch(api, Instant.now().getEpochSecond(), ZoneId.systemDefault(),
+                        () -> isStopped() || generation != store.generation());
+                statisticsUpdated = true;
+            } catch (WeReadApi.UpgradeRequiredException | CancellationException | InterruptedException error) {
+                throw error;
+            } catch (Exception ignored) {
+                // Statistics are optional: preserve both existing durations and successfully fetched notes.
+            }
+            snapshot = snapshot.withReadingStatistics(statistics);
             if (isStopped() || !key.equals(new SecretStore(context).read())
                     || !store.replace(snapshot, generation)) return Result.failure();
             long shelfCount = snapshot.books.stream().filter(book -> book.onShelf).count();
             store.setStatus("同步完成 · " + shelfCount + " 个书架条目 · "
-                    + snapshot.notes.size() + " 条笔记内容", generation);
+                    + snapshot.notes.size() + " 条笔记内容"
+                    + (statisticsUpdated ? "" : " · 阅读统计暂未更新"), generation);
             HighlightWidgetProvider.renderAll(context);
             return Result.success();
         } catch (Exception error) {

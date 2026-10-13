@@ -8,6 +8,8 @@
     <color name="search_surface">#EAF0F8</color>
     <color name="outline">#E3EAF5</color>
     <color name="quote_accent">#C5D7FF</color>
+    <color name="favorite_gold_light">#E8D7AC</color>
+    <color name="favorite_gold_dark">#CDA45A</color>
     <color name="text_primary">#1D2C48</color>
     <color name="text_secondary">#62728B</color>
     <color name="text_hint">#6F7D94</color>

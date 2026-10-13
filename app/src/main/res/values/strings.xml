@@ -9,7 +9,6 @@
     <string name="current_thought_title">我的想法</string>
     <string name="empty_quote">同步后，这里会显示你的划线。</string>
     <string name="quote_book">《%1$s》</string>
-    <string name="quote_book_chapter">《%1$s》 · %2$s</string>
     <string name="next_quote">下一句</string>
     <string name="quote_saved">已收藏到收藏笔记</string>
     <string name="quote_already_saved">这句已收藏</string>
@@ -104,7 +103,7 @@
     <string name="update_current">已检查更新，当前适配可用。</string>
     <string name="update_check_unavailable">暂未能完成更新检查，继续使用已保存的适配配置。</string>
     <string name="update_compatibility_pending">微信读书接口有更新，正在等待兼容适配。已有笔记仍可查看。</string>
-    <string name="update_app_available">发现拾句 %1$s，可前往“应用更新”下载新版。</string>
+    <string name="update_app_available">发现拾句 %1$s，点击“查看新版应用”下载安装。</string>
     <string name="app_update_title">应用更新</string>
     <string name="app_update_back">‹ 返回</string>
     <string name="app_update_current_version">当前版本 %1$s</string>

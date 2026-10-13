@@ -15,6 +15,7 @@ final class LibrarySnapshot {
     final List<Highlight> highlights;
     final boolean complete;
     final boolean recentReadingAvailable;
+    final ReadingStatistics readingStatistics;
 
     LibrarySnapshot(List<ShelfBook> books, List<BookNote> notes, List<Highlight> highlights,
                     boolean complete) {
@@ -23,11 +24,21 @@ final class LibrarySnapshot {
 
     private LibrarySnapshot(List<ShelfBook> books, List<BookNote> notes, List<Highlight> highlights,
                             boolean complete, boolean recentReadingAvailable) {
+        this(books, notes, highlights, complete, recentReadingAvailable, null);
+    }
+
+    private LibrarySnapshot(List<ShelfBook> books, List<BookNote> notes, List<Highlight> highlights,
+                            boolean complete, boolean recentReadingAvailable, ReadingStatistics readingStatistics) {
         this.books = books;
         this.notes = notes;
         this.highlights = highlights;
         this.complete = complete;
         this.recentReadingAvailable = recentReadingAvailable;
+        this.readingStatistics = readingStatistics;
+    }
+
+    LibrarySnapshot withReadingStatistics(ReadingStatistics statistics) {
+        return new LibrarySnapshot(books, notes, highlights, complete, recentReadingAvailable, statistics);
     }
 
     static LibrarySnapshot empty() {
@@ -41,9 +52,10 @@ final class LibrarySnapshot {
         for (ShelfBook book : books) bookArray.put(book.toJson());
         for (BookNote note : notes) noteArray.put(note.toJson());
         for (Highlight highlight : highlights) highlightArray.put(highlight.toJson());
-        return new JSONObject().put("version", 3).put("complete", complete)
+        return new JSONObject().put("version", 4).put("complete", complete)
                 .put("recentReadingAvailable", recentReadingAvailable)
-                .put("books", bookArray).put("notes", noteArray).put("highlights", highlightArray);
+                .put("books", bookArray).put("notes", noteArray).put("highlights", highlightArray)
+                .put("readingStatistics", readingStatistics == null ? JSONObject.NULL : readingStatistics.toJson());
     }
 
     static LibrarySnapshot fromJson(Object value) throws JSONException {
@@ -59,8 +71,16 @@ final class LibrarySnapshot {
         for (int i = 0; i < array.length(); i++) notes.add(BookNote.fromJson(array.getJSONObject(i)));
         array = json.getJSONArray("highlights");
         for (int i = 0; i < array.length(); i++) highlights.add(Highlight.fromJson(array.getJSONObject(i)));
+        ReadingStatistics statistics = null;
+        JSONObject storedStatistics = json.optJSONObject("readingStatistics");
+        if (storedStatistics != null) {
+            try { statistics = ReadingStatistics.fromJson(storedStatistics); }
+            catch (JSONException | IllegalArgumentException | java.time.DateTimeException ignored) {
+                /* Keep the user's book and note cache if the statistics section is corrupt. */
+            }
+        }
         return new LibrarySnapshot(books, notes, highlights, json.optBoolean("complete"),
-                json.optInt("version") >= 3 && json.optBoolean("recentReadingAvailable"));
+                json.optInt("version") >= 3 && json.optBoolean("recentReadingAvailable"), statistics);
     }
 
     private static LibrarySnapshot fromLegacy(JSONArray array) throws JSONException {

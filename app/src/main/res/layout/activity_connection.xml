@@ -3,7 +3,6 @@
     <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:minHeight="48dp" android:layout_marginStart="24dp" android:layout_marginEnd="24dp" android:layout_marginTop="20dp" android:orientation="horizontal">
         <Button android:id="@+id/weread_tab" style="@style/ReadingTab" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:text="@string/weread_tab" />
         <Button android:id="@+id/ai_tab" style="@style/ReadingTab" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:text="@string/ai_tab" />
-        <Button android:id="@+id/app_updates" style="@style/TextAction" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:text="@string/app_update_title" />
     </LinearLayout>
     <FrameLayout android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1">
         <ScrollView android:id="@+id/weread_panel" android:layout_width="match_parent" android:layout_height="match_parent" android:fillViewport="true" android:scrollbars="none">

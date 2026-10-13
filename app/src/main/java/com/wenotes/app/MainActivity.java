@@ -6,22 +6,34 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.view.accessibility.AccessibilityNodeInfo;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.time.Duration;
+import java.time.ZonedDateTime;
 
 public final class MainActivity extends Activity {
     private QuoteCardLayout quoteCard;
     private QuoteStackLayout quoteStack;
     private View nextCard;
+    private ReadingCalendarView readingCalendar;
     private HighlightStore store;
     private NoteFavoriteStore favoriteStore;
+    private CoverLoader coverLoader;
     private Highlight currentHighlight;
     private SharedPreferences statePrefs;
     private LibrarySnapshot cachedLibrary = LibrarySnapshot.empty();
+    private final Map<String, ShelfBook> cachedBooks = new HashMap<>();
     private long loadedSync = -1L;
     private long loadedGeneration = -1L;
     private boolean updateActive;
+    private final Runnable calendarRollover = () -> {
+        refreshUi();
+        scheduleCalendarRollover();
+    };
     private final SharedPreferences.OnSharedPreferenceChangeListener stateListener =
             (prefs, key) -> runOnUiThread(this::refreshUi);
 
@@ -32,10 +44,15 @@ public final class MainActivity extends Activity {
         AppNavigation.bind(this, 0);
         store = new HighlightStore(this);
         favoriteStore = new NoteFavoriteStore(this);
+        coverLoader = new CoverLoader(this);
         statePrefs = getSharedPreferences("highlight_state", Context.MODE_PRIVATE);
         quoteCard = findViewById(R.id.module_quote);
         quoteStack = findViewById(R.id.quote_stack);
         nextCard = findViewById(R.id.quote_next_card);
+        readingCalendar = findViewById(R.id.reading_calendar);
+        readingCalendar.restoreSelection(state);
+        quoteCard.setBackground(new QuoteCardBackground(this));
+        nextCard.setBackground(new QuoteCardBackground(this));
         ((TextView) nextCard.findViewById(R.id.current_quote)).setTextIsSelectable(false);
         ((TextView) nextCard.findViewById(R.id.current_thought)).setTextIsSelectable(false);
         quoteCard.setSwipeListener(new QuoteCardLayout.SwipeListener() {
@@ -77,6 +94,8 @@ public final class MainActivity extends Activity {
     @Override
     protected void onResume() {
         super.onResume();
+        refreshUi();
+        scheduleCalendarRollover();
         updateActive = true;
         ApiUpdateManager.checkAsync(this, false, () -> {
             if (updateActive && !isFinishing() && !isDestroyed()) AppUpdateActivity.offer(this);
@@ -86,6 +105,7 @@ public final class MainActivity extends Activity {
     @Override
     protected void onPause() {
         updateActive = false;
+        readingCalendar.removeCallbacks(calendarRollover);
         super.onPause();
     }
 
@@ -103,6 +123,25 @@ public final class MainActivity extends Activity {
         super.onStop();
     }
 
+    @Override
+    protected void onDestroy() {
+        coverLoader.dispose();
+        super.onDestroy();
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle state) {
+        readingCalendar.saveSelection(state);
+        super.onSaveInstanceState(state);
+    }
+
+    private void scheduleCalendarRollover() {
+        ZonedDateTime now = ZonedDateTime.now();
+        long delay = Duration.between(now, now.toLocalDate().plusDays(1).atStartOfDay(now.getZone())).toMillis();
+        readingCalendar.removeCallbacks(calendarRollover);
+        readingCalendar.postDelayed(calendarRollover, delay + 100);
+    }
+
     private void nextQuote() {
         if (cachedLibrary.highlights.isEmpty()) return;
         store.next(cachedLibrary.highlights.size());
@@ -114,6 +153,7 @@ public final class MainActivity extends Activity {
         if (currentHighlight == null) return false;
         try {
             boolean added = favoriteStore.add(FavoriteNote.fromHighlight(currentHighlight, cachedLibrary));
+            quoteCard.setActivated(true);
             Toast.makeText(this, added ? R.string.quote_saved : R.string.quote_already_saved,
                     Toast.LENGTH_SHORT).show();
             return true;
@@ -128,37 +168,60 @@ public final class MainActivity extends Activity {
         long generation = store.generation();
         if (synced != loadedSync || generation != loadedGeneration) {
             cachedLibrary = store.readLibrary();
+            cachedBooks.clear();
+            for (ShelfBook book : cachedLibrary.books) cachedBooks.put(book.id, book);
             loadedSync = synced;
             loadedGeneration = generation;
         }
+        coverLoader.loadMissing(cachedLibrary.books, this::refreshUi);
+        readingCalendar.bind(cachedLibrary);
         List<Highlight> highlights = cachedLibrary.highlights;
+        Map<String, FavoriteNote> favorites = favoriteStore.read();
         quoteCard.setSwipeEnabled(!highlights.isEmpty());
         quoteStack.setCardCount(highlights.size());
         currentHighlight = null;
         if (highlights.isEmpty()) {
-            bindQuote(quoteCard, null);
+            bindQuote(quoteCard, null, favorites);
         } else {
             int index = store.index(highlights.size());
             currentHighlight = highlights.get(index);
-            bindQuote(quoteCard, currentHighlight);
-            if (highlights.size() > 1) bindQuote(nextCard, highlights.get((index + 1) % highlights.size()));
+            bindQuote(quoteCard, currentHighlight, favorites);
+            if (highlights.size() > 1) bindQuote(nextCard, highlights.get((index + 1) % highlights.size()), favorites);
         }
         quoteStack.contentChanged();
     }
 
-    private void bindQuote(View card, Highlight highlight) {
+    private void bindQuote(View card, Highlight highlight, Map<String, FavoriteNote> favorites) {
+        card.setActivated(highlight != null
+                && favorites.containsKey(FavoriteNote.key(highlight.bookId, highlight.id)));
         TextView quoteView = card.findViewById(R.id.current_quote);
         TextView thoughtView = card.findViewById(R.id.current_thought);
         View thoughtPanel = card.findViewById(R.id.current_thought_panel);
+        View bookPanel = card.findViewById(R.id.current_book_panel);
         TextView bookView = card.findViewById(R.id.current_book);
+        TextView chapterView = card.findViewById(R.id.current_chapter);
+        ImageView coverView = card.findViewById(R.id.current_cover);
+        TextView coverPlaceholder = card.findViewById(R.id.current_cover_placeholder);
         if (highlight == null) {
             quoteView.setText(R.string.empty_quote);
             thoughtPanel.setVisibility(View.GONE);
+            bookPanel.setVisibility(View.GONE);
             bookView.setText("");
+            chapterView.setText("");
+            coverView.setTag(null);
+            coverView.setImageDrawable(null);
+            coverPlaceholder.setText("");
         } else {
             quoteView.setText(highlight.text);
-            bookView.setText(highlight.chapter.isEmpty() ? getString(R.string.quote_book, highlight.title)
-                    : getString(R.string.quote_book_chapter, highlight.title, highlight.chapter));
+            bookPanel.setVisibility(View.VISIBLE);
+            bookView.setText(getString(R.string.quote_book, highlight.title));
+            chapterView.setText(highlight.chapter);
+            chapterView.setVisibility(highlight.chapter.isEmpty() ? View.GONE : View.VISIBLE);
+            coverPlaceholder.setText(highlight.title);
+            ShelfBook book = cachedBooks.get(highlight.bookId);
+            if (book == null) book = new ShelfBook(highlight.bookId, highlight.title,
+                    highlight.author, "book", false, 0, 0, 0);
+            coverLoader.bind(coverView, coverPlaceholder, book);
             if (highlight.thought.isEmpty()) {
                 thoughtPanel.setVisibility(View.GONE);
             } else {

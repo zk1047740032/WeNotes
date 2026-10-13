@@ -51,7 +51,6 @@ public final class ConnectionActivity extends Activity {
         updatePrefs = getSharedPreferences(ApiUpdateManager.PREFS, Context.MODE_PRIVATE);
         findViewById(R.id.check_updates).setOnClickListener(view -> checkUpdates());
         findViewById(R.id.open_app_update).setOnClickListener(view -> openAppUpdate());
-        findViewById(R.id.app_updates).setOnClickListener(view -> startActivity(new Intent(this, AppUpdateActivity.class)));
         findViewById(R.id.save_sync).setOnClickListener(view -> saveAndSync());
         findViewById(R.id.clear_data).setOnClickListener(view -> clearData());
         findViewById(R.id.open_key_help).setOnClickListener(view -> openKeyHelp());

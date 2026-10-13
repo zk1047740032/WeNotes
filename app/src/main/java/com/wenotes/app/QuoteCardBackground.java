@@ -1,0 +1,91 @@
+package com.wenotes.app;
+
+import android.content.Context;
+import android.graphics.Canvas;
+import android.graphics.ColorFilter;
+import android.graphics.LinearGradient;
+import android.graphics.Outline;
+import android.graphics.Paint;
+import android.graphics.PixelFormat;
+import android.graphics.Rect;
+import android.graphics.RectF;
+import android.graphics.Shader;
+import android.graphics.drawable.Drawable;
+
+/** Adds a soft gold rim to saved quotes without changing their layout or shadow outline. */
+final class QuoteCardBackground extends Drawable {
+    private final Paint surface = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private final Paint rim = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private final RectF cardBounds = new RectF();
+    private final RectF rimBounds = new RectF();
+    private final float density;
+    private final float radius;
+    private final int goldLight;
+    private final int goldDark;
+    private int alpha = 255;
+    private boolean saved;
+
+    QuoteCardBackground(Context context) {
+        density = context.getResources().getDisplayMetrics().density;
+        radius = 20 * density;
+        surface.setColor(context.getColor(R.color.surface));
+        rim.setStyle(Paint.Style.STROKE);
+        goldLight = context.getColor(R.color.favorite_gold_light);
+        goldDark = context.getColor(R.color.favorite_gold_dark);
+    }
+
+    @Override protected void onBoundsChange(Rect bounds) {
+        cardBounds.set(bounds);
+        rimBounds.set(bounds);
+        rimBounds.inset(density, density);
+        rim.setShader(new LinearGradient(bounds.left, bounds.top, bounds.right, bounds.bottom,
+                goldLight, goldDark, Shader.TileMode.CLAMP));
+    }
+
+    @Override public void draw(Canvas canvas) {
+        if (saved) {
+            // Overlapping translucent strokes soften the outer edge without software blur.
+            for (int step = 5; step >= 1; step--) {
+                rim.setStrokeWidth((2 + step * 2) * density);
+                rim.setAlpha(Math.round(alpha * (6 - step) * 0.015f));
+                canvas.drawRoundRect(rimBounds, radius - density, radius - density, rim);
+            }
+        }
+        canvas.drawRoundRect(cardBounds, radius, radius, surface);
+        if (saved) {
+            rim.setStrokeWidth(2 * density);
+            rim.setAlpha(alpha);
+            canvas.drawRoundRect(rimBounds, radius - density, radius - density, rim);
+        }
+    }
+
+    @Override public boolean isStateful() { return true; }
+
+    @Override protected boolean onStateChange(int[] states) {
+        boolean activated = false;
+        for (int state : states) if (state == android.R.attr.state_activated) activated = true;
+        if (saved == activated) return false;
+        saved = activated;
+        invalidateSelf();
+        return true;
+    }
+
+    @Override public void getOutline(Outline outline) {
+        outline.setRoundRect(getBounds(), radius);
+        outline.setAlpha(alpha / 255f);
+    }
+
+    @Override public void setAlpha(int value) {
+        alpha = value;
+        surface.setAlpha(value);
+        invalidateSelf();
+    }
+
+    @Override public void setColorFilter(ColorFilter filter) {
+        surface.setColorFilter(filter);
+        rim.setColorFilter(filter);
+        invalidateSelf();
+    }
+
+    @Override public int getOpacity() { return PixelFormat.TRANSLUCENT; }
+}

@@ -26,6 +26,18 @@ public class FavoriteNoteTest {
     }
 
     @Test
+    public void savedQuoteIdentitySurvivesEditsWithoutMatchingOtherQuotes() {
+        BookNote original = note("ab", "c", "highlight", "旧原文", "");
+        Map<String, FavoriteNote> saved = new LinkedHashMap<>();
+        saved.put(FavoriteNote.key(original), new FavoriteNote(original, "旧书名", "作者"));
+        Highlight edited = new Highlight("c", "ab", "新书名", "作者", "第二章",
+                "更新后的原文", "新增想法", "", 2, 456);
+        assertTrue(saved.containsKey(FavoriteNote.key(edited.bookId, edited.id)));
+        assertFalse(saved.containsKey(FavoriteNote.key("a", "bc")));
+        assertFalse(saved.containsKey(FavoriteNote.key("ab", "another-note")));
+    }
+
+    @Test
     public void editedNotesAndRenamedBooksUseCurrentSnapshotWithoutAddingFavorites() {
         FavoriteNote saved = new FavoriteNote(note("b", "n", "review", "", "旧想法"), "旧书名", "旧作者");
         Map<String, FavoriteNote> favorites = new LinkedHashMap<>();

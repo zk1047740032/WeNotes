@@ -49,9 +49,6 @@
                 android:gravity="center" android:padding="24dp" android:text="@string/loading_library"
                 android:textSize="15sp" android:textColor="@color/text_secondary" android:lineSpacingExtra="6dp" />
         </FrameLayout>
-        <TextView android:id="@+id/library_sync_status" android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:gravity="center" android:paddingTop="10dp" android:paddingBottom="12dp" android:textSize="11sp"
-            android:textColor="@color/text_hint" android:maxLines="2" android:ellipsize="end" />
     </LinearLayout>
     <include layout="@layout/bottom_navigation" />
 </LinearLayout>

@@ -21,8 +21,12 @@ final class FavoriteNote {
     }
 
     static String key(BookNote note) {
+        return key(note.bookId, note.id);
+    }
+
+    static String key(String bookId, String noteId) {
         // Length-prefix the book ID so IDs from different books cannot collide.
-        return note.bookId.length() + ":" + note.bookId + note.id;
+        return bookId.length() + ":" + bookId + noteId;
     }
 
     static FavoriteNote fromHighlight(Highlight highlight, LibrarySnapshot snapshot) {

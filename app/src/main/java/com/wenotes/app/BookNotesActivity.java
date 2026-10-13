@@ -41,6 +41,7 @@ public final class BookNotesActivity extends LibraryActivity {
         bookId = getIntent().getStringExtra("book_id");
         globalFavorites = getIntent().getBooleanExtra("favorite_notes", false);
         findViewById(R.id.notes_header).setVisibility(globalFavorites ? View.GONE : View.VISIBLE);
+        findViewById(R.id.library_sync_status).setVisibility(globalFavorites ? View.GONE : View.VISIBLE);
         favoritesOnly = globalFavorites || state != null && state.getBoolean("favorites_only");
         findViewById(R.id.notes_bottom_navigation).setVisibility(globalFavorites ? View.VISIBLE : View.GONE);
         if (globalFavorites) AppNavigation.bind(this, 2);
