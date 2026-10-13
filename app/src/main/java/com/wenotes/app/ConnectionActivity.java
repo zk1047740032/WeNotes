@@ -51,6 +51,7 @@ public final class ConnectionActivity extends Activity {
         updatePrefs = getSharedPreferences(ApiUpdateManager.PREFS, Context.MODE_PRIVATE);
         findViewById(R.id.check_updates).setOnClickListener(view -> checkUpdates());
         findViewById(R.id.open_app_update).setOnClickListener(view -> openAppUpdate());
+        findViewById(R.id.app_updates).setOnClickListener(view -> startActivity(new Intent(this, AppUpdateActivity.class)));
         findViewById(R.id.save_sync).setOnClickListener(view -> saveAndSync());
         findViewById(R.id.clear_data).setOnClickListener(view -> clearData());
         findViewById(R.id.open_key_help).setOnClickListener(view -> openKeyHelp());
@@ -226,7 +227,7 @@ public final class ConnectionActivity extends Activity {
         ApiUpdateManager.Snapshot updates = new ApiUpdateManager(this).snapshot();
         if (!updates.appUpdateAvailable()) return;
         try {
-            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(updates.configuration.updateUrl)));
+            startActivity(new Intent(this, AppUpdateActivity.class));
         } catch (ActivityNotFoundException error) {
             Toast.makeText(this, R.string.no_browser, Toast.LENGTH_LONG).show();
         }

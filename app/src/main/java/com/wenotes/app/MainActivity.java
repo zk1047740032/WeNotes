@@ -21,6 +21,7 @@ public final class MainActivity extends Activity {
     private LibrarySnapshot cachedLibrary = LibrarySnapshot.empty();
     private long loadedSync = -1L;
     private long loadedGeneration = -1L;
+    private boolean updateActive;
     private final SharedPreferences.OnSharedPreferenceChangeListener stateListener =
             (prefs, key) -> runOnUiThread(this::refreshUi);
 
@@ -28,7 +29,6 @@ public final class MainActivity extends Activity {
     protected void onCreate(Bundle state) {
         super.onCreate(state);
         setContentView(R.layout.activity_main);
-        ApiUpdateManager.checkAsync(this, false, null);
         AppNavigation.bind(this, 0);
         store = new HighlightStore(this);
         favoriteStore = new NoteFavoriteStore(this);
@@ -72,6 +72,21 @@ public final class MainActivity extends Activity {
             }
         });
         refreshUi();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        updateActive = true;
+        ApiUpdateManager.checkAsync(this, false, () -> {
+            if (updateActive && !isFinishing() && !isDestroyed()) AppUpdateActivity.offer(this);
+        });
+    }
+
+    @Override
+    protected void onPause() {
+        updateActive = false;
+        super.onPause();
     }
 
     @Override

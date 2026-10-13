@@ -69,6 +69,7 @@ final class ApiUpdateManager implements WeReadApi.Profiles {
                         .putString("active_version", refreshed.profile.version)
                         .putInt("active_page_size", refreshed.profile.pageSize)
                         .putLong("last_attempt", now).putBoolean("last_check_ok", refreshed.checked);
+                editor.putBoolean("app_check_ok", refreshed.appChecked);
                 if (refreshed.checked) editor.putLong("last_successful_check", now);
                 editor.apply();
             } catch (Exception error) {

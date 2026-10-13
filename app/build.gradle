@@ -1,5 +1,29 @@
+import groovy.json.JsonSlurper
+import groovy.json.JsonOutput
+
 plugins {
     id 'com.android.application'
+}
+
+def appVersion = new Properties()
+rootProject.file('version.properties').withInputStream { appVersion.load(it) }
+def signingFile = rootProject.file('signing.properties')
+def privateSigning = new Properties()
+if (signingFile.exists()) signingFile.withInputStream { privateSigning.load(it) }
+def generatedUpdateAssets = layout.buildDirectory.dir('generated/updateAssets')
+def generateUpdateAssets = tasks.register('generateUpdateAssets') {
+    inputs.file(rootProject.file('updates/compatibility.json'))
+    inputs.file(rootProject.file('version.properties'))
+    outputs.dir(generatedUpdateAssets)
+    doLast {
+        def config = new JsonSlurper().parse(rootProject.file('updates/compatibility.json'))
+        config.app = [versionCode: appVersion.getProperty('versionCode').toInteger(),
+                      versionName: appVersion.getProperty('versionName'),
+                      updateUrl: 'https://github.com/zk1047740032/WeNotes/releases']
+        def destination = generatedUpdateAssets.get().file('compatibility.json').asFile
+        destination.parentFile.mkdirs()
+        destination.setText(JsonOutput.prettyPrint(JsonOutput.toJson(config)) + '\n', 'UTF-8')
+    }
 }
 
 android {
@@ -10,8 +34,26 @@ android {
         applicationId 'com.wenotes.app'
         minSdk 26
         targetSdk 35
-        versionCode 2
-        versionName '1.1.0'
+        versionCode appVersion.getProperty('versionCode').toInteger()
+        versionName appVersion.getProperty('versionName')
+        testInstrumentationRunner 'com.wenotes.app.AppUpdateInstrumentation'
+    }
+
+    signingConfigs {
+        if (signingFile.exists()) {
+            fixed {
+                storeFile rootProject.file(privateSigning.getProperty('storeFile'))
+                storePassword privateSigning.getProperty('storePassword')
+                keyAlias privateSigning.getProperty('keyAlias')
+                keyPassword privateSigning.getProperty('keyPassword')
+            }
+        }
+    }
+    buildTypes {
+        if (signingFile.exists()) {
+            debug { signingConfig signingConfigs.fixed }
+            release { signingConfig signingConfigs.fixed }
+        }
     }
 
     compileOptions {
@@ -24,15 +66,18 @@ android {
     }
 
     sourceSets {
-        main.assets.srcDir(rootProject.file('updates'))
+        main.assets.srcDir(generatedUpdateAssets)
     }
 
     testOptions.unitTests.all {
-        systemProperty 'wenotes.updateConfig', rootProject.file('updates/compatibility.json').absolutePath
+        systemProperty 'wenotes.updateConfig', generatedUpdateAssets.get().file('compatibility.json').asFile.absolutePath
     }
 }
 
+tasks.named('preBuild').configure { dependsOn generateUpdateAssets }
+
 dependencies {
+    implementation 'androidx.core:core:1.12.0'
     implementation 'androidx.work:work-runtime:2.12.0'
     testImplementation 'junit:junit:4.13.2'
     // Use Android's JSON behavior in JVM tests (including duplicate-key handling).

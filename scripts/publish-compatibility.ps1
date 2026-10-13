@@ -1,15 +1,23 @@
-param([switch]$Publish)
+param([switch]$Publish, [string]$ConfigPath)
 
 $ErrorActionPreference = 'Stop'
 $repoRoot = Split-Path -Parent $PSScriptRoot
-$configPath = Join-Path $repoRoot 'updates\compatibility.json'
-$config = Get-Content -LiteralPath $configPath -Raw | ConvertFrom-Json
+$configPath = if ($ConfigPath) { $ConfigPath } else { Join-Path $repoRoot 'updates\compatibility.json' }
+$config = Get-Content -LiteralPath $configPath -Raw -Encoding UTF8 | ConvertFrom-Json
 if ($config.schema -ne 1 -or $config.revision -lt 1) { throw 'Invalid configuration schema or revision.' }
 if (@($config.PSObject.Properties.Name | Where-Object { $_ -cnotin @('schema','revision','app','profiles') }).Count) {
     throw 'Only public compatibility metadata may be published.'
 }
-if (@($config.app.PSObject.Properties.Name | Where-Object { $_ -cnotin @('versionCode','versionName','updateUrl') }).Count) {
+if (@($config.app.PSObject.Properties.Name | Where-Object { $_ -cnotin @('versionCode','versionName','updateUrl','releaseNotes','apk') }).Count) {
     throw 'Unsupported application metadata.'
+}
+if ($config.app.releaseNotes -and $config.app.releaseNotes.Length -gt 4000) { throw 'Release notes are too long.' }
+if ($config.app.apk) {
+    $apk = $config.app.apk
+    if (@($apk.PSObject.Properties.Name | Where-Object { $_ -cnotin @('url','size','sha256','signerSha256') }).Count -or
+        $apk.url -cnotmatch '^https://github\.com/zk1047740032/WeNotes/releases/download/v\d{1,6}\.\d{1,6}\.\d{1,6}/[A-Za-z0-9._-]+\.apk$' -or
+        $apk.size -lt 1024 -or $apk.size -gt 157286400 -or $apk.sha256 -cnotmatch '^[0-9a-f]{64}$' -or
+        $apk.signerSha256 -cnotmatch '^[0-9a-f]{64}$') { throw 'Invalid APK metadata.' }
 }
 if ($config.app.versionCode -lt 1 -or
     $config.app.versionName -notmatch '^\d{1,6}\.\d{1,6}\.\d{1,6}$' -or

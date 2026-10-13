@@ -20,14 +20,18 @@ final class UpdateConfiguration {
     final int appVersionCode;
     final String appVersionName;
     final String updateUrl;
+    final String releaseNotes;
+    final ApkUpdateSpec apk;
     final List<Profile> profiles;
 
     private UpdateConfiguration(long revision, int appVersionCode, String appVersionName,
-                                String updateUrl, List<Profile> profiles) {
+                                String updateUrl, String releaseNotes, ApkUpdateSpec apk, List<Profile> profiles) {
         this.revision = revision;
         this.appVersionCode = appVersionCode;
         this.appVersionName = appVersionName;
         this.updateUrl = updateUrl;
+        this.releaseNotes = releaseNotes;
+        this.apk = apk;
         this.profiles = profiles;
     }
 
@@ -39,6 +43,9 @@ final class UpdateConfiguration {
         int appCode = app.getInt("versionCode");
         String appName = app.getString("versionName");
         String updateUrl = app.getString("updateUrl");
+        String releaseNotes = app.optString("releaseNotes", "");
+        if (releaseNotes.length() > 4000) throw new IllegalArgumentException("Update notes are too long");
+        ApkUpdateSpec apk = app.has("apk") ? ApkUpdateSpec.parse(app) : null;
         if (revision < 1 || appCode < 1 || !isVersion(appName) || !isUpdateUrl(updateUrl)) {
             throw new IllegalArgumentException("Invalid update metadata");
         }
@@ -61,7 +68,7 @@ final class UpdateConfiguration {
             }
             profiles.add(new Profile(version, adapter, minimum, pageSize));
         }
-        return new UpdateConfiguration(revision, appCode, appName, updateUrl, profiles);
+        return new UpdateConfiguration(revision, appCode, appName, updateUrl, releaseNotes, apk, profiles);
     }
 
     Profile choose(String officialVersion, int appCode, Profile fallback) {
@@ -112,7 +119,7 @@ final class UpdateConfiguration {
         }
         UpdateConfiguration configuration = parse(json);
         return new Refresh(json, official, configuration.choose(official, appCode, currentProfile),
-                configChecked && officialChecked);
+                configChecked && officialChecked, configChecked);
     }
 
     static final class Refresh {
@@ -120,12 +127,14 @@ final class UpdateConfiguration {
         final String officialVersion;
         final Profile profile;
         final boolean checked;
+        final boolean appChecked;
 
-        Refresh(String json, String officialVersion, Profile profile, boolean checked) {
+        Refresh(String json, String officialVersion, Profile profile, boolean checked, boolean appChecked) {
             this.json = json;
             this.officialVersion = officialVersion;
             this.profile = profile;
             this.checked = checked;
+            this.appChecked = appChecked;
         }
     }
 

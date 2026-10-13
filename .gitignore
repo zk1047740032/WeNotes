@@ -10,3 +10,5 @@ local.properties
 *.jks
 *.keystore
 .env
+/signing.properties
+/.signing/
