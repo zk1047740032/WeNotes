@@ -36,6 +36,8 @@
 
 脚本默认递增 `versionCode` 和补丁版本，例如 1.2.0 → 1.2.1。指定版本用 `-VersionName 1.3.0`；发布已经准备/提交的当前版本用 `-UseCurrentVersion -Publish`。
 
+版本名（`versionName`）用于显示，整数版本码（`versionCode`）决定手机是否有新版：只有线上版本码大于已安装版本码才提示更新。每次发布新改动都递增两者；已经给手机安装的 APK 也视为已分发，不能因为 GitHub 尚无 Release 而复用版本。`-UseCurrentVersion` 只用于明确尚未分发的预备版本或恢复同一次中断发布。
+
 `-Publish` 会构建验证、提交版本文件、推送 `main`、创建 GitHub Release 草稿、上传 APK 与版本配置，然后公开 Release；最后才通过 Contents API 更新线上 `updates/compatibility.json` 并快进拉取。不会先发布没有可下载 APK 的新版提示。构建时生成单独的内置配置，使用 APK 自己的版本，移除远端安装包校验信息，避免 APK 包含自己的哈希。
 
 脚本使用已有 GitHub credential helper 登录，令牌不会写入文件。APK、发布输出、签名与本机配置均不提交。版本配置只包含公开信息。

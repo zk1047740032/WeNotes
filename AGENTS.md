@@ -15,6 +15,7 @@
 2. 检查本次实际改动，把用户可理解的更新内容写入 `release-notes.md`。完成相关验证后提交功能改动与说明，使发布脚本开始时工作区干净。不要把不相关改动悄悄丢弃或夹带进发布。
 3. 确认 `signing.properties` 与 `.signing/wenotes.keystore` 存在，使用原固定签名。缺失时优先恢复私有备份；另一台电脑不能用新生成的调试签名替代现有发布签名。
 4. 读取 `version.properties`、线上 `updates/compatibility.json` 和已有 Releases，选择尚未发布且版本码高于线上版本的版本。当前版本已准备、尚未发布时执行 `./scripts/publish-app.ps1 -UseCurrentVersion -Publish`；正常下一版执行 `./scripts/publish-app.ps1 -Publish`，脚本默认递增补丁版本和版本码；用户指定版本时使用 `-VersionName`。不要对同一次发布重复递增版本。
+   已交付手机安装的 APK 也视为已分发版本，即使没有 GitHub Release 或线上公告，也不能沿用其版本号和版本码发布新改动。常规发版必须递增；`-UseCurrentVersion` 只用于明确尚未分发的预备版本或同一次中断发布的恢复，不能仅凭 GitHub 没有 Release 判断版本可复用。
 5. 发布脚本会执行 `testDebugUnitTest lintDebug assembleRelease`，校验 APK 包名、版本、大小、SHA-256 和固定签名，提交版本变更、推送 `main`、上传 Release 草稿附件、公开 Release，然后更新线上版本配置并快进拉取。必须先让 APK 可下载，再向手机公告新版。
 6. 发布后实际核对公开 Release、APK 下载地址、线上版本配置的版本码/哈希/大小，以及 Git 工作区和远端提交。报告最终版本、Release 链接、验证结果与本机 APK 路径，只有核对完成才称为发布成功。
 
