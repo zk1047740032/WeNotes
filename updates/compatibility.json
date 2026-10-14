@@ -1,15 +1,15 @@
 {
   "schema": 1,
-  "revision": 5,
+  "revision": 6,
   "app": {
-    "versionCode": 6,
-    "versionName": "1.2.3",
+    "versionCode": 7,
+    "versionName": "1.2.4",
     "updateUrl": "https://github.com/zk1047740032/WeNotes/releases",
-    "releaseNotes": "阅读页提供阅读节奏、最近在读、阅读足迹三张卡片，默认展示本周阅读节奏。左右滑动循环切换，沿用句子卡片的层叠、倾斜、后卡抬升缩放和回弹动效，不同高度的卡片平滑过渡。\n\n阅读时长图改为蓝青渐变圆角柱、浅灰虚线网格和右侧小时刻度。刻度随实际时长调整，最高刻度只取高于最高柱子的下一档，并压低图表高度，减少多余空白。\n\n精简阅读卡片的标题、重复说明和提示语，日期范围与阅读时长同排对齐，收紧句子卡片与下方阅读卡片之间的间距。\n\n底部导航仅保留四个图标，移除文字并缩短导航栏高度。",
+    "releaseNotes": "摘录正文字号调整为 18sp，阅读卡片显示更紧凑。\n\n修复底部导航栏的悬空感：背景延伸至屏幕底边，与系统手势区连成一体，保留图标的安全间距，并适配键盘弹出时的布局。",
     "apk": {
-      "url": "https://github.com/zk1047740032/WeNotes/releases/download/v1.2.3/WeNotes-1.2.3.apk",
-      "size": 2317864,
-      "sha256": "7e90671f7daaa9c1eef10a60c4a1b3c41ce7f897f07fa62e28b74b56bd57c90e",
+      "url": "https://github.com/zk1047740032/WeNotes/releases/download/v1.2.4/WeNotes-1.2.4.apk",
+      "size": 2318028,
+      "sha256": "c60559677cac2c3a6fe78f829454fbedfec1f33a4a441c07a6b630a4a22c631c",
       "signerSha256": "7fa56310217debfb9b53b33c7c944be31eee842bfe53f8cbe0eea777aa3a69e5"
     }
   },
