@@ -6,7 +6,6 @@
     <color name="reading_heat_2">#ABC6F7</color>
     <color name="reading_heat_3">#739BEC</color>
     <color name="reading_calendar_future_surface">#EDF0F5</color>
-    <string name="reading_calendar_title">字里行间的一周</string>
     <string name="reading_calendar_reading">阅读</string>
     <string name="reading_calendar_synced_time">已同步时长</string>
     <string name="reading_calendar_books">本书</string>

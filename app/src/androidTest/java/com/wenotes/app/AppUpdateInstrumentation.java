@@ -35,6 +35,11 @@ public final class AppUpdateInstrumentation extends Instrumentation {
     @Override public void onStart() {
         Bundle result = new Bundle();
         try {
+            if (arguments != null && "true".equals(arguments.getString("quoteStack"))) {
+                result.putString("stream", "\nPassed " + QuoteStackChecks.run(this) + " quote stack transition checks.\n");
+                finish(Activity.RESULT_OK, result);
+                return;
+            }
             Context context = getTargetContext();
             int signatureFlags = Build.VERSION.SDK_INT >= 28 ? PackageManager.GET_SIGNING_CERTIFICATES : PackageManager.GET_SIGNATURES;
             PackageInfo installed = context.getPackageManager().getPackageInfo(context.getPackageName(), signatureFlags);

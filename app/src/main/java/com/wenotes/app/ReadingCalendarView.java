@@ -1,7 +1,6 @@
 package com.wenotes.app;
 
 import android.content.Context;
-import android.graphics.Typeface;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.text.SpannableString;
@@ -36,6 +35,9 @@ public final class ReadingCalendarView extends LinearLayout {
     public ReadingCalendarView(Context context, AttributeSet attributes) {
         super(context, attributes);
         setOrientation(VERTICAL);
+        setPaddingRelative(dp(16), dp(20), dp(16), dp(20));
+        setBackground(background(R.color.surface, 22));
+        setElevation(dp(2));
     }
 
     void bind(LibrarySnapshot snapshot) {
@@ -66,23 +68,25 @@ public final class ReadingCalendarView extends LinearLayout {
         int elapsed = today.getDayOfWeek().getValue();
         List<ShelfBook> books = ReadingStatistics.recentBooks(library.books,
                 Instant.now().getEpochSecond(), ZoneId.systemDefault());
-        LinearLayout header = row();
-        TextView title = text(getContext().getString(R.string.reading_calendar_title), 14, R.color.text_primary);
-        title.setTypeface(Typeface.create("sans-serif-medium", Typeface.NORMAL));
-        header.addView(title, new LayoutParams(0, LayoutParams.WRAP_CONTENT, 1));
-        header.addView(text(RANGE.format(monday) + " — " + RANGE.format(monday.plusDays(6)), 11, R.color.text_secondary));
-        addView(header);
-
         LinearLayout summary = row();
         String duration = known == 0 ? "—" : duration(statistics.totalSeconds(today));
         summary.addView(summary(duration, getContext().getString(known == elapsed
-                ? R.string.reading_calendar_reading : R.string.reading_calendar_synced_time)),
-                new LayoutParams(0, LayoutParams.WRAP_CONTENT, 3.3f));
+                ? R.string.reading_calendar_reading : R.string.reading_calendar_synced_time)));
+        LayoutParams booksParams = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+        booksParams.setMarginStart(dp(16));
         summary.addView(summary(library.recentReadingAvailable ? String.valueOf(books.size()) : "—",
-                getContext().getString(R.string.reading_calendar_books)), new LayoutParams(0, LayoutParams.WRAP_CONTENT, 1));
+                getContext().getString(R.string.reading_calendar_books)), booksParams);
+        LayoutParams daysParams = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+        daysParams.setMarginStart(dp(16));
         summary.addView(summary(known == 0 ? "—" : String.valueOf(statistics.readingDays(today)),
-                getContext().getString(R.string.reading_calendar_days)), new LayoutParams(0, LayoutParams.WRAP_CONTENT, 1));
-        addView(summary, spaced(14));
+                getContext().getString(R.string.reading_calendar_days)), daysParams);
+        summary.addView(new View(getContext()), new LayoutParams(0, 0, 1));
+        TextView range = text(RANGE.format(monday) + " — " + RANGE.format(monday.plusDays(6)), 11, R.color.text_secondary);
+        range.setSingleLine(true);
+        LayoutParams rangeParams = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+        rangeParams.setMarginStart(dp(12));
+        summary.addView(range, rangeParams);
+        addView(summary);
 
         dates = row();
         dates.setBaselineAligned(false);
@@ -147,7 +151,7 @@ public final class ReadingCalendarView extends LinearLayout {
         detail = new LinearLayout(getContext());
         detail.setOrientation(VERTICAL);
         detail.setPadding(dp(14), dp(13), dp(14), dp(13));
-        detail.setBackground(background(R.color.surface, 16));
+        detail.setBackground(background(R.color.background, 16));
         detail.setAccessibilityLiveRegion(View.ACCESSIBILITY_LIVE_REGION_POLITE);
         bindDetail();
         addView(detail, spaced(16));

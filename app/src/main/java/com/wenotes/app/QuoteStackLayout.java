@@ -130,8 +130,9 @@ public final class QuoteStackLayout extends FrameLayout {
             back.measure(exactWidth, exactHeight);
         }
         int tail = hasNextCard() ? Math.round((cardCount > 2 ? 24 : 12) * density) : 0;
+        // Follow the transition in both directions while the outgoing card keeps its natural size.
         setMeasuredDimension(resolveSize(width, widthMeasureSpec),
-                resolveSize(Math.max(frontHeight, layerHeight) + tail, heightMeasureSpec));
+                resolveSize(layerHeight + tail, heightMeasureSpec));
     }
 
     @Override
