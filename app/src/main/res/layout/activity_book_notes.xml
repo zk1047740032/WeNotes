@@ -53,5 +53,5 @@
             android:gravity="center" android:paddingTop="10dp" android:paddingBottom="12dp" android:textSize="11sp"
             android:textColor="@color/text_hint" android:maxLines="2" android:ellipsize="end" />
     </LinearLayout>
-    <include android:id="@+id/notes_bottom_navigation" layout="@layout/bottom_navigation" android:visibility="gone" />
+    <include layout="@layout/bottom_navigation" android:visibility="gone" />
 </LinearLayout>
