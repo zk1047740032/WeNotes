@@ -1,15 +1,15 @@
 {
   "schema": 1,
-  "revision": 4,
+  "revision": 5,
   "app": {
-    "versionCode": 5,
-    "versionName": "1.2.2",
+    "versionCode": 6,
+    "versionName": "1.2.3",
     "updateUrl": "https://github.com/zk1047740032/WeNotes/releases",
-    "releaseNotes": "阅读统计区域改用白色圆角卡片和轻阴影，整合本周统计、阅读日历、每日详情及读过的书；每日详情采用浅色内嵌背景，层次更清楚。\n\n精简统计区域布局：移除“字里行间的一周”标题，将阅读时长、书籍数量和阅读天数紧凑排列，日期范围在同一行靠右显示。\n\n修复阅读卡片切换时的高度联动：下一张卡片较小时，下方统计区域也会随滑动平滑上移；取消滑动时同步恢复，切换完成时不再突然跳动。",
+    "releaseNotes": "阅读页提供阅读节奏、最近在读、阅读足迹三张卡片，默认展示本周阅读节奏。左右滑动循环切换，沿用句子卡片的层叠、倾斜、后卡抬升缩放和回弹动效，不同高度的卡片平滑过渡。\n\n阅读时长图改为蓝青渐变圆角柱、浅灰虚线网格和右侧小时刻度。刻度随实际时长调整，最高刻度只取高于最高柱子的下一档，并压低图表高度，减少多余空白。\n\n精简阅读卡片的标题、重复说明和提示语，日期范围与阅读时长同排对齐，收紧句子卡片与下方阅读卡片之间的间距。\n\n底部导航仅保留四个图标，移除文字并缩短导航栏高度。",
     "apk": {
-      "url": "https://github.com/zk1047740032/WeNotes/releases/download/v1.2.2/WeNotes-1.2.2.apk",
-      "size": 2312172,
-      "sha256": "04e289956d7d3f4072316f39ac341d272dce84b29a6dd4ddc91d8d6aa469dcb3",
+      "url": "https://github.com/zk1047740032/WeNotes/releases/download/v1.2.3/WeNotes-1.2.3.apk",
+      "size": 2317864,
+      "sha256": "7e90671f7daaa9c1eef10a60c4a1b3c41ce7f897f07fa62e28b74b56bd57c90e",
       "signerSha256": "7fa56310217debfb9b53b33c7c944be31eee842bfe53f8cbe0eea777aa3a69e5"
     }
   },
