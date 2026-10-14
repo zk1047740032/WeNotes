@@ -7,7 +7,7 @@ import android.util.AttributeSet;
 import android.view.View;
 import android.widget.FrameLayout;
 
-/** Measures the active card naturally and raises the actual next quote underneath it. */
+/** Measures the active card naturally and raises the actual next card underneath it. */
 public final class QuoteStackLayout extends FrameLayout {
     private final float density;
     private QuoteCardLayout front;
@@ -30,10 +30,16 @@ public final class QuoteStackLayout extends FrameLayout {
     @Override
     protected void onFinishInflate() {
         super.onFinishInflate();
-        front = findViewById(R.id.module_quote);
-        next = findViewById(R.id.quote_next_card);
-        back = findViewById(R.id.quote_stack_back);
+        setCards(findViewById(R.id.module_quote), findViewById(R.id.quote_next_card),
+                findViewById(R.id.quote_stack_back));
+    }
+
+    void setCards(QuoteCardLayout front, View next, View back) {
+        this.front = front;
+        this.next = next;
+        this.back = back;
         front.setStack(this);
+        contentChanged();
     }
 
     void setCardCount(int count) {

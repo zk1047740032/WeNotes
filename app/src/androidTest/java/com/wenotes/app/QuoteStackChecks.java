@@ -35,7 +35,7 @@ final class QuoteStackChecks {
         QuoteStackLayout stack = home.findViewById(R.id.quote_stack);
         View front = home.findViewById(R.id.module_quote);
         View next = home.findViewById(R.id.quote_next_card);
-        View statistics = home.findViewById(R.id.reading_calendar);
+        View statistics = home.findViewById(R.id.reading_cards);
         front.setMinimumHeight(dp(fromDp));
         next.setMinimumHeight(dp(toDp));
         stack.setCardCount(cards);

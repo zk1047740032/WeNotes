@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="reading_rhythm_title">本周阅读节奏</string>
+    <string name="reading_recent_title">最近在读</string>
+    <string name="reading_timeline_title">最近的阅读足迹</string>
+    <string name="reading_daily_average">日均时长</string>
+    <string name="reading_synced_average">已同步日均</string>
+    <string name="reading_longest_day">读得最久</string>
+    <string name="reading_best_day">周%1$s · %2$s</string>
+    <string name="reading_chart_day">%1$s，%2$s</string>
+    <string name="reading_future">尚未到来</string>
+    <string name="reading_unknown">尚未同步</string>
+    <string name="reading_statistics_pending">阅读统计尚未同步。请在“我的 → 微信读书”中保存并同步。</string>
+    <string name="reading_statistics_partial">本周已过去%2$d天，其中%1$d天已同步，其余日期待同步。</string>
+    <string name="reading_no_recent_books">暂无最近阅读的书籍。</string>
+    <string name="reading_books_pending">书籍阅读记录尚未同步。请在“我的 → 微信读书”中保存并同步。</string>
+    <string name="reading_no_notes">暂无带日期的划线或想法。</string>
+    <string name="reading_notes_pending">阅读记录尚未同步。请在“我的 → 微信读书”中保存并同步。</string>
+    <string name="reading_highlight">划线</string>
+    <string name="reading_thought">想法</string>
+    <string name="reading_review">书评</string>
+    <string name="reading_unknown_book">未知书籍</string>
+    <string name="reading_today">今天</string>
+    <string name="reading_yesterday">昨天</string>
+    <string name="reading_under_minute">不足1分钟</string>
+    <string name="reading_hours_minutes">%1$d小时%2$d分</string>
+    <string name="reading_minutes">%1$d分钟</string>
+    <string name="reading_card_position">%1$s，第%2$d张，共%3$d张</string>
+</resources>

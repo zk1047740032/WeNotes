@@ -19,7 +19,7 @@ public final class MainActivity extends Activity {
     private QuoteCardLayout quoteCard;
     private QuoteStackLayout quoteStack;
     private View nextCard;
-    private ReadingCalendarView readingCalendar;
+    private ReadingCardsView readingCards;
     private HighlightStore store;
     private NoteFavoriteStore favoriteStore;
     private CoverLoader coverLoader;
@@ -49,8 +49,8 @@ public final class MainActivity extends Activity {
         quoteCard = findViewById(R.id.module_quote);
         quoteStack = findViewById(R.id.quote_stack);
         nextCard = findViewById(R.id.quote_next_card);
-        readingCalendar = findViewById(R.id.reading_calendar);
-        readingCalendar.restoreSelection(state);
+        readingCards = findViewById(R.id.reading_cards);
+        readingCards.restoreSelection(state);
         quoteCard.setBackground(new QuoteCardBackground(this));
         nextCard.setBackground(new QuoteCardBackground(this));
         ((TextView) nextCard.findViewById(R.id.current_quote)).setTextIsSelectable(false);
@@ -105,7 +105,7 @@ public final class MainActivity extends Activity {
     @Override
     protected void onPause() {
         updateActive = false;
-        readingCalendar.removeCallbacks(calendarRollover);
+        readingCards.removeCallbacks(calendarRollover);
         super.onPause();
     }
 
@@ -120,6 +120,7 @@ public final class MainActivity extends Activity {
     protected void onStop() {
         statePrefs.unregisterOnSharedPreferenceChangeListener(stateListener);
         quoteCard.resetSwipe();
+        readingCards.resetSwipe();
         super.onStop();
     }
 
@@ -131,15 +132,15 @@ public final class MainActivity extends Activity {
 
     @Override
     protected void onSaveInstanceState(Bundle state) {
-        readingCalendar.saveSelection(state);
+        readingCards.saveSelection(state);
         super.onSaveInstanceState(state);
     }
 
     private void scheduleCalendarRollover() {
         ZonedDateTime now = ZonedDateTime.now();
         long delay = Duration.between(now, now.toLocalDate().plusDays(1).atStartOfDay(now.getZone())).toMillis();
-        readingCalendar.removeCallbacks(calendarRollover);
-        readingCalendar.postDelayed(calendarRollover, delay + 100);
+        readingCards.removeCallbacks(calendarRollover);
+        readingCards.postDelayed(calendarRollover, delay + 100);
     }
 
     private void nextQuote() {
@@ -173,8 +174,11 @@ public final class MainActivity extends Activity {
             loadedSync = synced;
             loadedGeneration = generation;
         }
-        coverLoader.loadMissing(cachedLibrary.books, this::refreshUi);
-        readingCalendar.bind(cachedLibrary);
+        coverLoader.loadMissing(cachedLibrary.books, () -> {
+            readingCards.refreshCovers();
+            refreshUi();
+        });
+        readingCards.bind(cachedLibrary, coverLoader);
         List<Highlight> highlights = cachedLibrary.highlights;
         Map<String, FavoriteNote> favorites = favoriteStore.read();
         quoteCard.setSwipeEnabled(!highlights.isEmpty());
