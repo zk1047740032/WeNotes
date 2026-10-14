@@ -12,7 +12,8 @@ import android.widget.LinearLayout;
 public final class QuoteCardLayout extends LinearLayout {
     interface SwipeListener {
         boolean onBeforeSwipe(boolean left);
-        void onAdvance();
+        default void onSwipeDirectionChanged(boolean left) {}
+        void onAdvance(boolean left);
     }
 
     private final int touchSlop;
@@ -73,12 +74,12 @@ public final class QuoteCardLayout extends LinearLayout {
                     .withEndAction(() -> {
                         if (generation != animationGeneration) return;
                         stack.setDragProgress(1);
-                        swipeListener.onAdvance();
+                        swipeListener.onAdvance(left);
                         if (generation != animationGeneration) return;
                         finishAnimation(generation);
                     }).start();
         } else {
-            swipeListener.onAdvance();
+            swipeListener.onAdvance(left);
             if (generation == animationGeneration) animateHome(generation);
         }
         return true;
@@ -165,6 +166,7 @@ public final class QuoteCardLayout extends LinearLayout {
             // Screen coordinates remain stable while this view moves under the finger.
             float dx = event.getRawX() - downX;
             float dy = event.getRawY() - downY;
+            if (swipeListener != null) swipeListener.onSwipeDirectionChanged(dx < 0);
             float progress = Math.min(1, Math.abs(dx) / Math.max(1, getWidth()));
             float verticalLimit = Math.min(getHeight() * 0.3f, 120 * density);
             setTranslationX(dx);

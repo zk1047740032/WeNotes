@@ -62,7 +62,7 @@ public final class MainActivity extends Activity {
             }
 
             @Override
-            public void onAdvance() {
+            public void onAdvance(boolean left) {
                 nextQuote();
             }
         });

@@ -8,6 +8,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.accessibility.AccessibilityNodeInfo;
 import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 
 /** Exercises the shared stack and its reading content without changing the persisted cache. */
 final class ReadingCardsChecks {
@@ -15,7 +16,8 @@ final class ReadingCardsChecks {
     private ReadingCardsView cards;
     private QuoteStackLayout stack;
     private QuoteCardLayout front;
-    private View next;
+    private LinearLayout next;
+    private final View[] pages = new View[3];
     private int count;
     private long downTime;
 
@@ -30,18 +32,21 @@ final class ReadingCardsChecks {
             checks.cards.bind(LibrarySnapshot.empty(), null);
             checks.stack = (QuoteStackLayout) checks.cards.getChildAt(0);
             checks.front = (QuoteCardLayout) checks.stack.getChildAt(2);
-            checks.next = checks.stack.getChildAt(1);
+            checks.next = (LinearLayout) checks.stack.getChildAt(1);
+            checks.pages[0] = checks.front.getChildAt(0);
+            checks.pages[1] = checks.next.getChildAt(0);
             checks.layout();
             require(checks.cards.selectedPage() == 0, "Rhythm is not the default card");
             checks.checkHeightTransition(false);
         });
         checks.swipe(-400, 40, false);
         checks.assertPage(1);
+        checks.onMain(() -> checks.pages[2] = checks.next.getChildAt(0));
         checks.swipe(-400, 0, false);
         checks.assertPage(2);
         checks.onMain(() -> checks.checkHeightTransition(true));
         checks.swipe(-400, 0, false);
-        checks.assertPage(0); // Both swipe directions reveal the next card, as on the quote stack.
+        checks.assertPage(0);
         checks.swipe(400, 0, true);
         checks.assertPage(0);
         checks.swipe(-30, 0, false);
@@ -49,20 +54,40 @@ final class ReadingCardsChecks {
         checks.swipe(0, -400, false);
         checks.assertPage(0);
         checks.swipe(400, 0, false);
+        checks.assertPage(2); // A right swipe wraps from the first card to the last.
+        checks.swipe(400, 0, false);
         checks.assertPage(1);
+        checks.swipe(400, 0, false);
+        checks.assertPage(0);
+        checks.onMain(() -> {
+            checks.send(MotionEvent.ACTION_DOWN, 450, 450);
+            checks.send(MotionEvent.ACTION_MOVE, 50, 450);
+            require(checks.next.getChildAt(0) == checks.pages[1], "Left drag did not preview the next card");
+            checks.send(MotionEvent.ACTION_MOVE, 850, 450);
+            require(checks.next.getChildAt(0) == checks.pages[2], "Reversed drag did not preview the previous card");
+            checks.send(MotionEvent.ACTION_UP, 850, 450);
+        });
+        SystemClock.sleep(400);
+        checks.assertPage(2);
         checks.onMain(() -> {
             Bundle state = new Bundle();
             checks.cards.saveSelection(state);
             ReadingCardsView restored = new ReadingCardsView(instrumentation.getTargetContext(), null);
             restored.restoreSelection(state);
             restored.bind(LibrarySnapshot.empty(), null);
-            require(restored.selectedPage() == 1, "Restoration lost selected card");
+            require(restored.selectedPage() == 2, "Restoration lost selected card");
             QuoteStackLayout restoredStack = (QuoteStackLayout) restored.getChildAt(0);
             require(restoredStack.getChildAt(1).getImportantForAccessibility()
                     == View.IMPORTANT_FOR_ACCESSIBILITY_NO_HIDE_DESCENDANTS, "Hidden card is accessible");
             checks.count++;
-            checks.cards.performAccessibilityAction(AccessibilityNodeInfo.ACTION_SCROLL_BACKWARD, null);
+            require(checks.cards.performAccessibilityAction(AccessibilityNodeInfo.ACTION_SCROLL_BACKWARD, null),
+                    "Backward accessibility action was rejected");
+            require(checks.next.getChildAt(0) == checks.pages[1], "Backward action previewed the wrong card");
         });
+        SystemClock.sleep(400);
+        checks.assertPage(1);
+        checks.onMain(() -> require(checks.cards.performAccessibilityAction(
+                AccessibilityNodeInfo.ACTION_SCROLL_FORWARD, null), "Forward accessibility action was rejected"));
         SystemClock.sleep(400);
         checks.assertPage(2);
         checks.onMain(() -> {
@@ -114,6 +139,8 @@ final class ReadingCardsChecks {
                 require(front.getScaleX() < 1, "Front card did not follow the quote scale");
                 require(next.getScaleX() > 0.95f && next.getTranslationX() == 0,
                         "Next card slid sideways instead of rising underneath");
+                int expected = (cards.selectedPage() + (dx < 0 ? 1 : 2)) % pages.length;
+                require(next.getChildAt(0) == pages[expected], "Drag previewed the wrong card");
             }
             send(cancel ? MotionEvent.ACTION_CANCEL : MotionEvent.ACTION_UP, 450 + dx, 450 + dy);
         });

@@ -57,10 +57,16 @@ public final class ReadingCardsView extends FrameLayout {
         stack.setCards(front, next, back);
         stack.setCardCount(pages.length);
         front.setSwipeListener(new QuoteCardLayout.SwipeListener() {
-            @Override public boolean onBeforeSwipe(boolean left) { return library != null; }
+            @Override public boolean onBeforeSwipe(boolean left) {
+                if (library == null) return false;
+                showPreview(left);
+                return true;
+            }
 
-            @Override public void onAdvance() {
-                selectedPage = (selectedPage + 1) % pages.length;
+            @Override public void onSwipeDirectionChanged(boolean left) { showPreview(left); }
+
+            @Override public void onAdvance(boolean left) {
+                selectedPage = adjacentPage(left);
                 showSelection();
                 sendAccessibilityEvent(AccessibilityEvent.TYPE_VIEW_SCROLLED);
             }
@@ -103,10 +109,22 @@ public final class ReadingCardsView extends FrameLayout {
         next.removeAllViews();
         if (pages[selectedPage] != null) {
             front.addView(pages[selectedPage]);
-            next.addView(pages[(selectedPage + 1) % pages.length]);
+            showPreview(true);
         }
         setContentDescription(getContext().getString(R.string.reading_card_position,
                 getContext().getString(TITLES[selectedPage]), selectedPage + 1, pages.length));
+        stack.contentChanged();
+    }
+
+    private int adjacentPage(boolean left) {
+        return (selectedPage + (left ? 1 : pages.length - 1)) % pages.length;
+    }
+
+    private void showPreview(boolean left) {
+        ReadingCardContent preview = pages[adjacentPage(left)];
+        if (preview == null || preview.getParent() == next) return;
+        next.removeAllViews();
+        next.addView(preview);
         stack.contentChanged();
     }
 
