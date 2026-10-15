@@ -1,15 +1,15 @@
 {
   "schema": 1,
-  "revision": 7,
+  "revision": 8,
   "app": {
-    "versionCode": 8,
-    "versionName": "1.2.5",
+    "versionCode": 9,
+    "versionName": "1.2.6",
     "updateUrl": "https://github.com/zk1047740032/WeNotes/releases",
-    "releaseNotes": "应用图标更换为「暖纸书签」设计：暖色纸张与书签造型，适配 Android 桌面的圆形和圆角图标。\n\n阅读卡片现在按滑动方向切换：左滑查看下一张，右滑返回上一张，首尾循环切换，滑动预览同步显示对应卡片。",
+    "releaseNotes": "应用图标更正为选定的蓝底白色书页与引号设计，使用原始图稿，并适配 Android 桌面的圆形和圆角图标。",
     "apk": {
-      "url": "https://github.com/zk1047740032/WeNotes/releases/download/v1.2.5/WeNotes-1.2.5.apk",
-      "size": 3012736,
-      "sha256": "80aa3101961e2eac77140eae15562e9d631893f9edcd0315620772bc2f5128ac",
+      "url": "https://github.com/zk1047740032/WeNotes/releases/download/v1.2.6/WeNotes-1.2.6.apk",
+      "size": 3292500,
+      "sha256": "9859211e7859d3a7e546ede33f22eb26caa784bd049cfddb2ba9b98d7d852b44",
       "signerSha256": "7fa56310217debfb9b53b33c7c944be31eee842bfe53f8cbe0eea777aa3a69e5"
     }
   },
