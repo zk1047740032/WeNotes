@@ -1,11 +1,13 @@
 package com.wenotes.app;
 
+import android.animation.ValueAnimator;
 import android.content.Context;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.ViewConfiguration;
 import android.view.animation.DecelerateInterpolator;
 import android.view.animation.OvershootInterpolator;
+import android.view.animation.LinearInterpolator;
 import android.widget.LinearLayout;
 
 /** Lets the card follow and tilt with a swipe, including swipes on selectable text. */
@@ -28,6 +30,7 @@ public final class QuoteCardLayout extends LinearLayout {
     private boolean swipeEnabled = true;
     private boolean settling;
     private int animationGeneration;
+    private ValueAnimator favoriteSweep;
 
     public QuoteCardLayout(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -51,6 +54,29 @@ public final class QuoteCardLayout extends LinearLayout {
         if (!enabled) resetSwipe();
     }
 
+    void playFavoriteSweep() {
+        cancelFavoriteSweep();
+        if (!ValueAnimator.areAnimatorsEnabled()
+                || !(getBackground() instanceof QuoteCardBackground)) return;
+        QuoteCardBackground background = (QuoteCardBackground) getBackground();
+        ValueAnimator animator = ValueAnimator.ofFloat(0, 1);
+        favoriteSweep = animator;
+        animator.setDuration(460);
+        animator.setInterpolator(new LinearInterpolator());
+        animator.addUpdateListener(value -> background.setFavoriteSweep((float) value.getAnimatedValue()));
+        animator.start();
+    }
+
+    private void cancelFavoriteSweep() {
+        if (favoriteSweep != null) {
+            favoriteSweep.cancel();
+            favoriteSweep = null;
+        }
+        if (getBackground() instanceof QuoteCardBackground) {
+            ((QuoteCardBackground) getBackground()).setFavoriteSweep(-1);
+        }
+    }
+
     boolean performSwipe(boolean left) {
         if (!swipeEnabled || settling || swipeListener == null) return false;
         settling = true;
@@ -67,10 +93,12 @@ public final class QuoteCardLayout extends LinearLayout {
             float exitY = getTranslationY() * distance
                     / Math.max(swipeDistance, Math.abs(getTranslationX()));
             exitY = Math.max(-160 * density, Math.min(160 * density, exitY));
-            stack.animateProgress(1, 220, new DecelerateInterpolator());
+            long duration = favoriteSweep != null ? 300 : 220;
+            long delay = favoriteSweep != null ? 160 : 0;
             animate().translationX(left ? -distance : distance).translationY(exitY).rotation(left ? -14 : 14)
-                    .translationZ(0).alpha(1).setDuration(220)
+                    .translationZ(0).alpha(1).setDuration(duration).setStartDelay(delay)
                     .setInterpolator(new DecelerateInterpolator())
+                    .withStartAction(() -> stack.animateProgress(1, duration, new DecelerateInterpolator()))
                     .withEndAction(() -> {
                         if (generation != animationGeneration) return;
                         stack.setDragProgress(1);
@@ -86,15 +114,17 @@ public final class QuoteCardLayout extends LinearLayout {
     }
 
     private void animateHome(int generation) {
+        cancelFavoriteSweep();
         if (stack != null) stack.animateProgress(0, 280, new OvershootInterpolator(0.75f));
         animate().translationX(0).translationY(0).rotation(0)
-                .scaleX(1).scaleY(1).translationZ(0).alpha(1).setDuration(280)
+                .scaleX(1).scaleY(1).translationZ(0).alpha(1).setDuration(280).setStartDelay(0)
                 .setInterpolator(new OvershootInterpolator(0.75f))
                 .withEndAction(() -> finishAnimation(generation)).start();
     }
 
     private void finishAnimation(int generation) {
         if (generation != animationGeneration) return;
+        cancelFavoriteSweep();
         resetPose();
         if (stack != null) stack.resetStack();
         settling = false;
@@ -116,7 +146,9 @@ public final class QuoteCardLayout extends LinearLayout {
         tracking = false;
         swiping = false;
         animate().cancel();
+        animate().setStartDelay(0).withStartAction(null);
         animate().withEndAction(null);
+        cancelFavoriteSweep();
         resetPose();
         if (stack != null) stack.resetStack();
         if (getParent() != null) getParent().requestDisallowInterceptTouchEvent(false);

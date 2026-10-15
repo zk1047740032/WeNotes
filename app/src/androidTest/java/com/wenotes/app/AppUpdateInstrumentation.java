@@ -35,6 +35,11 @@ public final class AppUpdateInstrumentation extends Instrumentation {
     @Override public void onStart() {
         Bundle result = new Bundle();
         try {
+            if (arguments != null && "true".equals(arguments.getString("quoteShare"))) {
+                result.putString("stream", "\nPassed " + QuoteShareChecks.run(this) + " quote share checks.\n");
+                finish(Activity.RESULT_OK, result);
+                return;
+            }
             if (arguments != null && "true".equals(arguments.getString("readingCards"))) {
                 result.putString("stream", "\nPassed " + ReadingCardsChecks.run(this) + " reading card checks.\n");
                 finish(Activity.RESULT_OK, result);

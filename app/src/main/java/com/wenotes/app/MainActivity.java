@@ -2,6 +2,7 @@ package com.wenotes.app;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
@@ -55,10 +56,13 @@ public final class MainActivity extends Activity {
         nextCard.setBackground(new QuoteCardBackground(this));
         ((TextView) nextCard.findViewById(R.id.current_quote)).setTextIsSelectable(false);
         ((TextView) nextCard.findViewById(R.id.current_thought)).setTextIsSelectable(false);
+        quoteCard.setOnLongClickListener(view -> shareQuote());
+        quoteCard.findViewById(R.id.current_quote).setOnLongClickListener(view -> shareQuote());
+        quoteCard.findViewById(R.id.current_thought).setOnLongClickListener(view -> shareQuote());
         quoteCard.setSwipeListener(new QuoteCardLayout.SwipeListener() {
             @Override
             public boolean onBeforeSwipe(boolean left) {
-                return left || favoriteQuote();
+                return left || toggleQuoteFavorite();
             }
 
             @Override
@@ -72,9 +76,12 @@ public final class MainActivity extends Activity {
                 super.onInitializeAccessibilityNodeInfo(host, info);
                 if (currentHighlight == null) return;
                 info.addAction(new AccessibilityNodeInfo.AccessibilityAction(
+                        AccessibilityNodeInfo.ACTION_LONG_CLICK, getString(R.string.quote_image_title)));
+                info.addAction(new AccessibilityNodeInfo.AccessibilityAction(
                         R.id.action_next_quote, getString(R.string.next_quote)));
                 info.addAction(new AccessibilityNodeInfo.AccessibilityAction(
-                        R.id.action_favorite_quote, getString(R.string.favorite_quote_and_next)));
+                        R.id.action_favorite_quote, getString(quoteCard.isActivated()
+                                ? R.string.unfavorite_quote_and_next : R.string.favorite_quote_and_next)));
             }
 
             @Override
@@ -150,18 +157,33 @@ public final class MainActivity extends Activity {
         refreshUi();
     }
 
-    private boolean favoriteQuote() {
+    private boolean toggleQuoteFavorite() {
         if (currentHighlight == null) return false;
         try {
-            boolean added = favoriteStore.add(FavoriteNote.fromHighlight(currentHighlight, cachedLibrary));
-            quoteCard.setActivated(true);
-            Toast.makeText(this, added ? R.string.quote_saved : R.string.quote_already_saved,
-                    Toast.LENGTH_SHORT).show();
+            FavoriteNote favorite = FavoriteNote.fromHighlight(currentHighlight, cachedLibrary);
+            boolean saved = favoriteStore.read().containsKey(FavoriteNote.key(favorite.note));
+            if (saved) favoriteStore.toggle(favorite);
+            else favoriteStore.add(favorite);
+            quoteCard.setActivated(!saved);
+            if (saved) Toast.makeText(this, R.string.quote_removed, Toast.LENGTH_SHORT).show();
+            else {
+                quoteCard.playFavoriteSweep();
+                quoteCard.announceForAccessibility(getString(R.string.quote_saved));
+            }
             return true;
         } catch (IllegalStateException error) {
             Toast.makeText(this, R.string.favorite_save_failed, Toast.LENGTH_SHORT).show();
             return false;
         }
+    }
+
+    private boolean shareQuote() {
+        if (currentHighlight == null || currentHighlight.text.trim().isEmpty()) return false;
+        startActivity(new Intent(this, QuoteShareActivity.class)
+                .putExtra(QuoteShareActivity.EXTRA_TEXT, currentHighlight.text)
+                .putExtra(QuoteShareActivity.EXTRA_AUTHOR, currentHighlight.author)
+                .putExtra(QuoteShareActivity.EXTRA_TITLE, currentHighlight.title));
+        return true;
     }
 
     private void refreshUi() {

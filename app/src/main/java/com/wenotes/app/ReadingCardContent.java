@@ -2,6 +2,7 @@ package com.wenotes.app;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Typeface;
 import android.graphics.drawable.GradientDrawable;
 import android.text.TextUtils;
@@ -100,6 +101,10 @@ final class ReadingCardContent extends LinearLayout {
             shelf.addView(column, new LayoutParams(0, LayoutParams.WRAP_CONTENT, 1));
             if (i >= books.size()) continue;
             ShelfBook book = books.get(i);
+            column.setFocusable(true);
+            column.setOnClickListener(view -> getContext().startActivity(
+                    new Intent(getContext(), BookNotesActivity.class).putExtra("book_id", book.id)
+                            .putExtra("book_title", book.title)));
             BookCoverFrame frame = new BookCoverFrame(getContext(), null);
             frame.setBackground(background(getContext(), R.color.surface_tint, 6));
             frame.setElevation(dp(1));

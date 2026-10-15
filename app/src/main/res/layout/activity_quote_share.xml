@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/quote_share_root" android:layout_width="match_parent" android:layout_height="match_parent"
+    android:orientation="vertical">
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:orientation="horizontal" android:gravity="center_vertical"
+        android:paddingStart="12dp" android:paddingEnd="24dp" android:paddingTop="12dp">
+        <ImageButton android:id="@+id/quote_share_back" android:layout_width="48dp" android:layout_height="48dp"
+            android:src="@drawable/ic_back" android:padding="12dp" android:background="@drawable/text_button_background"
+            android:contentDescription="@string/back" />
+        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
+            android:layout_marginStart="4dp" android:text="@string/quote_image_title" android:textSize="22sp"
+            android:textStyle="bold" android:textColor="@color/text_primary" />
+    </LinearLayout>
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:layout_marginStart="24dp" android:layout_marginEnd="24dp" android:layout_marginTop="16dp"
+        android:layout_marginBottom="20dp" android:orientation="horizontal" android:padding="4dp"
+        android:background="@drawable/segment_tray_background">
+        <Button android:id="@+id/quote_style_black_white" style="@style/PeriodTab"
+            android:layout_width="0dp" android:layout_height="48dp" android:layout_weight="1"
+            android:text="@string/quote_style_black_white" android:textSize="14sp" />
+        <Button android:id="@+id/quote_style_blue_magazine" style="@style/PeriodTab"
+            android:layout_width="0dp" android:layout_height="48dp" android:layout_weight="1"
+            android:text="@string/quote_style_blue_magazine" android:textSize="14sp" />
+    </LinearLayout>
+    <ScrollView android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1"
+        android:paddingStart="24dp" android:paddingEnd="24dp" android:scrollbars="none" android:clipToPadding="false">
+        <FrameLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:minHeight="320dp">
+            <ImageView android:id="@+id/quote_image_preview" android:layout_width="match_parent"
+                android:layout_height="wrap_content" android:adjustViewBounds="true" android:scaleType="fitCenter"
+                android:contentDescription="@string/quote_image_title"
+                android:importantForAccessibility="yes" />
+            <ProgressBar android:id="@+id/quote_image_progress" android:layout_width="40dp"
+                android:layout_height="40dp" android:layout_gravity="center" />
+        </FrameLayout>
+    </ScrollView>
+    <TextView android:id="@+id/quote_image_status" android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:minHeight="28dp" android:layout_marginTop="12dp" android:layout_marginStart="24dp"
+        android:layout_marginEnd="24dp" android:textColor="@color/text_secondary" android:textSize="13sp"
+        android:gravity="center" android:accessibilityLiveRegion="polite" />
+    <Button android:id="@+id/quote_image_save" style="@style/PrimaryAction" android:layout_width="match_parent"
+        android:layout_height="52dp" android:layout_marginStart="24dp" android:layout_marginEnd="24dp"
+        android:layout_marginTop="8dp" android:layout_marginBottom="24dp" android:text="@string/quote_image_save"
+        android:enabled="false" />
+</LinearLayout>

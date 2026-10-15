@@ -1,6 +1,7 @@
 param([switch]$Publish, [string]$ConfigPath)
 
 $ErrorActionPreference = 'Stop'
+. (Join-Path $PSScriptRoot 'release-common.ps1')
 $repoRoot = Split-Path -Parent $PSScriptRoot
 $configPath = if ($ConfigPath) { $ConfigPath } else { Join-Path $repoRoot 'updates\compatibility.json' }
 $config = Get-Content -LiteralPath $configPath -Raw -Encoding UTF8 | ConvertFrom-Json
@@ -40,7 +41,8 @@ $publicText = ($config | ConvertTo-Json -Depth 8).Replace("`r`n", "`n").TrimEnd(
 $publicBytes = [System.Text.Encoding]::UTF8.GetBytes($publicText)
 if ($publicBytes.Length -gt 32768) { throw 'Compatibility metadata exceeds the application limit.' }
 $endpoint = 'https://api.github.com/repos/zk1047740032/WeNotes/contents/updates/compatibility.json'
-$headers = @{ 'User-Agent' = 'WeNotes-update-publisher' }
+$headers = if ($Publish) { Get-WeNotesGitHubHeaders $repoRoot }
+    else { @{ 'User-Agent' = 'WeNotes-update-publisher' } }
 $current = $null
 try {
     $current = Invoke-RestMethod -Uri $endpoint -Headers $headers -TimeoutSec 20

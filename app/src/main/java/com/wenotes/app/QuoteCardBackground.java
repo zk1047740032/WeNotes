@@ -4,8 +4,10 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.ColorFilter;
 import android.graphics.LinearGradient;
+import android.graphics.Matrix;
 import android.graphics.Outline;
 import android.graphics.Paint;
+import android.graphics.Path;
 import android.graphics.PixelFormat;
 import android.graphics.Rect;
 import android.graphics.RectF;
@@ -16,6 +18,9 @@ import android.graphics.drawable.Drawable;
 final class QuoteCardBackground extends Drawable {
     private final Paint surface = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final Paint rim = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private final Paint sweep = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private final Matrix sweepMatrix = new Matrix();
+    private final Path cardClip = new Path();
     private final RectF cardBounds = new RectF();
     private final RectF rimBounds = new RectF();
     private final float density;
@@ -24,6 +29,13 @@ final class QuoteCardBackground extends Drawable {
     private final int goldDark;
     private int alpha = 255;
     private boolean saved;
+    private float sweepProgress = -1;
+    private float sweepWidth;
+
+    void setFavoriteSweep(float progress) {
+        sweepProgress = progress;
+        invalidateSelf();
+    }
 
     QuoteCardBackground(Context context) {
         density = context.getResources().getDisplayMetrics().density;
@@ -40,6 +52,13 @@ final class QuoteCardBackground extends Drawable {
         rimBounds.inset(density, density);
         rim.setShader(new LinearGradient(bounds.left, bounds.top, bounds.right, bounds.bottom,
                 goldLight, goldDark, Shader.TileMode.CLAMP));
+        cardClip.reset();
+        cardClip.addRoundRect(cardBounds, radius, radius, Path.Direction.CW);
+        sweepWidth = Math.max(1, bounds.width() * 0.35f);
+        int transparentGold = goldLight & 0x00ffffff;
+        sweep.setShader(new LinearGradient(-sweepWidth, 0, sweepWidth, bounds.height() * 0.25f,
+                new int[]{transparentGold, goldLight, transparentGold},
+                new float[]{0, 0.5f, 1}, Shader.TileMode.CLAMP));
     }
 
     @Override public void draw(Canvas canvas) {
@@ -56,6 +75,22 @@ final class QuoteCardBackground extends Drawable {
             rim.setStrokeWidth(2 * density);
             rim.setAlpha(alpha);
             canvas.drawRoundRect(rimBounds, radius - density, radius - density, rim);
+        }
+        if (saved && sweepProgress >= 0) {
+            float fade = Math.min(1, Math.min(sweepProgress, 1 - sweepProgress) * 5);
+            sweepMatrix.setTranslate(cardBounds.left - sweepWidth
+                    + (cardBounds.width() + 2 * sweepWidth) * sweepProgress, 0);
+            sweep.getShader().setLocalMatrix(sweepMatrix);
+            int checkpoint = canvas.save();
+            canvas.clipPath(cardClip);
+            sweep.setStyle(Paint.Style.FILL);
+            sweep.setAlpha(Math.round(alpha * 0.16f * fade));
+            canvas.drawRect(cardBounds, sweep);
+            sweep.setStyle(Paint.Style.STROKE);
+            sweep.setStrokeWidth(3 * density);
+            sweep.setAlpha(Math.round(alpha * fade));
+            canvas.drawRoundRect(rimBounds, radius - density, radius - density, sweep);
+            canvas.restoreToCount(checkpoint);
         }
     }
 
@@ -84,6 +119,7 @@ final class QuoteCardBackground extends Drawable {
     @Override public void setColorFilter(ColorFilter filter) {
         surface.setColorFilter(filter);
         rim.setColorFilter(filter);
+        sweep.setColorFilter(filter);
         invalidateSelf();
     }
 
