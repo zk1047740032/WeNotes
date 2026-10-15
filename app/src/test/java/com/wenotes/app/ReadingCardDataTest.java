@@ -4,6 +4,7 @@ import org.junit.Test;
 
 import java.time.LocalDate;
 import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -91,6 +92,26 @@ public final class ReadingCardDataTest {
         assertEquals("我的想法", ReadingCardData.preview(thought));
         assertEquals("划线原文", ReadingCardData.preview(highlight));
         assertEquals("原文", ReadingCardData.preview(note("fallback", "thought", "原文", "", 1)));
+    }
+
+    @Test public void expandedTimelineKeepsLatestThirtyValidNotesAcrossBooks() {
+        List<BookNote> notes = new ArrayList<>();
+        for (int i = 1; i <= 40; i++) {
+            notes.add(new BookNote("note-" + i, "book-" + (i % 2), "highlight", "", 0,
+                    "笔记" + i, "", i));
+        }
+        notes.add(note("future", "highlight", "未来", "", 101));
+        notes.add(note("unknown", "highlight", "无日期", "", 0));
+        notes.add(note("empty", "thought", " ", " ", 100));
+        notes.add(note("unsupported", "bookmark", "书签", "", 100));
+        List<BookNote> expanded = ReadingCardData.recentNotes(notes, 100, 30);
+        assertEquals(30, expanded.size());
+        assertEquals("note-40", expanded.get(0).id);
+        assertEquals("note-11", expanded.get(29).id);
+        assertEquals(3, ReadingCardData.recentNotes(notes, 100).size());
+        assertEquals("note-1", notes.get(0).id);
+        assertEquals(2, ReadingCardData.recentNotes(notes.subList(0, 2), 100, 30).size());
+        assertTrue(ReadingCardData.recentNotes(Collections.emptyList(), 100, 30).isEmpty());
     }
 
     private static ShelfBook book(String id, String kind, long lastRead) {

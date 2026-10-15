@@ -27,6 +27,7 @@ public class ReadingStatisticsTest {
         int[] minutes = {18, 0, 48, 31, 0, 70, 55};
         for (int i = 0; i < minutes.length; i++) times.put(String.valueOf(at(TODAY.minusDays(6 - i))), minutes[i] * 60);
         times.put(String.valueOf(at(TODAY.minusDays(7))), 100000);
+        times.put(String.valueOf(at(ReadingStatistics.weekStart(TODAY).minusDays(8))), 300000);
         times.put(String.valueOf(at(TODAY.plusDays(1))), 200000);
         ReadingStatistics result = ReadingStatistics.fetch((name, params) -> {
             assertEquals("/readdata/detail", name);
@@ -40,12 +41,13 @@ public class ReadingStatisticsTest {
         assertEquals(2, result.readingDays(TODAY));
         assertEquals(2, result.knownDays(TODAY));
         assertEquals(Long.valueOf(55 * 60), result.secondsOn(TODAY));
-        assertNull(result.secondsOn(TODAY.minusDays(7)));
-        assertNull(result.secondsOn(TODAY.minusDays(2)));
+        assertEquals(Long.valueOf(100000), result.secondsOn(TODAY.minusDays(7)));
+        assertEquals(Long.valueOf(0), result.secondsOn(TODAY.minusDays(2)));
+        assertNull(result.secondsOn(ReadingStatistics.weekStart(TODAY).minusDays(8)));
         assertNull(result.secondsOn(TODAY.plusDays(1)));
     }
 
-    @Test public void sevenDaysAcrossNewYearFetchBothMonthsAndMergeByDate() throws Exception {
+    @Test public void twoWeeksAcrossNewYearFetchBothMonthsAndMergeByDate() throws Exception {
         LocalDate today = LocalDate.of(2027, 1, 3);
         List<YearMonth> months = new ArrayList<>();
         ReadingStatistics result = ReadingStatistics.fetch((name, params) -> {
@@ -57,6 +59,8 @@ public class ReadingStatisticsTest {
         assertEquals(Arrays.asList(YearMonth.of(2026, 12), YearMonth.of(2027, 1)), months);
         assertEquals(180, result.totalSeconds(today));
         assertEquals(7, result.knownDays(today));
+        assertEquals(14, result.days.size());
+        assertEquals(Long.valueOf(0), result.secondsOn(LocalDate.of(2026, 12, 21)));
     }
 
     @Test public void dailyBucketsUseLocalDatesAcrossDaylightSavingChange() throws Exception {
@@ -68,7 +72,23 @@ public class ReadingStatisticsTest {
                 today.atTime(12, 0).atZone(zone).toEpochSecond(), zone, () -> false);
         assertEquals(2, result.readingDays(today));
         assertEquals(120, result.totalSeconds(today));
-        assertEquals(2, result.days.size());
+        assertEquals(9, result.days.size());
+    }
+
+    @Test public void previousWeekTriggersEarlierMonthEvenWhenCurrentWeekDoesNotCrossMonth() throws Exception {
+        LocalDate monday = LocalDate.of(2026, 2, 2);
+        List<YearMonth> months = new ArrayList<>();
+        ReadingStatistics result = ReadingStatistics.fetch((name, params) -> {
+            YearMonth month = YearMonth.from(java.time.Instant.ofEpochSecond(params.getLong("baseTime")).atZone(ZONE));
+            months.add(month);
+            LocalDate date = month.getMonthValue() == 1 ? monday.minusWeeks(1) : monday;
+            return new JSONObject().put("readTimes", new JSONObject().put(String.valueOf(at(date)), 120));
+        }, at(monday) + 3600, ZONE, () -> false);
+        assertEquals(Arrays.asList(YearMonth.of(2026, 1), YearMonth.of(2026, 2)), months);
+        assertEquals(Long.valueOf(120), result.secondsOn(monday.minusWeeks(1)));
+        assertEquals(8, result.days.size());
+        ReadingStatistics restored = ReadingStatistics.fromJson(new JSONObject(result.toJson().toString()));
+        assertEquals(Long.valueOf(120), restored.secondsOn(monday.minusWeeks(1)));
     }
 
     @Test public void missingOrInvalidDailyPayloadIsNotTreatedAsSevenZeroDays() {

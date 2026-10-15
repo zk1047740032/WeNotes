@@ -10,6 +10,7 @@
     <color name="quote_accent">#C5D7FF</color>
     <color name="reading_bar_top">#309FFF</color>
     <color name="reading_bar_bottom">#2DCCF4</color>
+    <color name="reading_comparison_previous">#B3C3D6</color>
     <color name="reading_chart_grid">#DEE2E9</color>
     <color name="reading_chart_label">#ADB5C3</color>
     <color name="favorite_gold_light">#E8D7AC</color>

@@ -35,6 +35,16 @@ public final class AppUpdateInstrumentation extends Instrumentation {
     @Override public void onStart() {
         Bundle result = new Bundle();
         try {
+            if (arguments != null && "true".equals(arguments.getString("readingComparison"))) {
+                result.putString("stream", "\nPassed " + ReadingComparisonChecks.run(this) + " reading comparison checks.\n");
+                finish(Activity.RESULT_OK, result);
+                return;
+            }
+            if (arguments != null && "true".equals(arguments.getString("readingTimeline"))) {
+                result.putString("stream", "\nPassed " + ReadingTimelineChecks.run(this) + " expanded timeline checks.\n");
+                finish(Activity.RESULT_OK, result);
+                return;
+            }
             if (arguments != null && "true".equals(arguments.getString("quoteShare"))) {
                 result.putString("stream", "\nPassed " + QuoteShareChecks.run(this) + " quote share checks.\n");
                 finish(Activity.RESULT_OK, result);

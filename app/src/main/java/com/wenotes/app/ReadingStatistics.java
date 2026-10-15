@@ -30,10 +30,10 @@ final class ReadingStatistics {
     static ReadingStatistics fetch(LibrarySync.Api api, long now, ZoneId zone,
                                    BooleanSupplier stopped) throws Exception {
         LocalDate today = Instant.ofEpochSecond(now).atZone(zone).toLocalDate();
-        LocalDate first = weekStart(today);
+        LocalDate first = weekStart(today).minusWeeks(1);
         Map<LocalDate, Long> days = new LinkedHashMap<>();
         for (LocalDate date = first; !date.isAfter(today); date = date.plusDays(1)) days.put(date, 0L);
-        // The elapsed part of a Monday–Sunday week can straddle two natural months.
+        // Keep last week and this week through today, including across month/year boundaries.
         for (YearMonth month = YearMonth.from(first); !month.isAfter(YearMonth.from(today));
              month = month.plusMonths(1)) {
             if (stopped.getAsBoolean()) throw new CancellationException();

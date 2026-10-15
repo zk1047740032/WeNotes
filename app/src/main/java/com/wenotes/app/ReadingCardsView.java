@@ -24,6 +24,7 @@ public final class ReadingCardsView extends FrameLayout {
     private LibrarySnapshot library;
     private LocalDate today;
     private int selectedPage;
+    private ReadingCardDialog expandedCard;
 
     public ReadingCardsView(Context context, AttributeSet attributes) {
         super(context, attributes);
@@ -53,6 +54,18 @@ public final class ReadingCardsView extends FrameLayout {
         front.setElevation(dp(6));
         front.setFocusable(true);
         front.setSwipeEnabled(false);
+        front.setOnLongClickListener(view -> {
+            if (selectedPage == 1 || library == null) return false;
+            if (expandedCard != null) return true;
+            front.resetSwipe();
+            ReadingCardDialog dialog = new ReadingCardDialog(getContext(), front, library, selectedPage);
+            expandedCard = dialog;
+            dialog.setOnDismissListener(closed -> {
+                if (expandedCard == dialog) expandedCard = null;
+            });
+            dialog.show();
+            return true;
+        });
         stack.addView(front, new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
         stack.setCards(front, next, back);
         stack.setCardCount(pages.length);
@@ -102,9 +115,16 @@ public final class ReadingCardsView extends FrameLayout {
 
     int selectedPage() { return selectedPage; }
 
-    void resetSwipe() { front.resetSwipe(); }
+    void resetSwipe() {
+        if (expandedCard != null) {
+            expandedCard.dismissImmediately();
+            expandedCard = null;
+        }
+        front.resetSwipe();
+    }
 
     private void showSelection() {
+        front.setLongClickable(selectedPage != 1);
         front.removeAllViews();
         next.removeAllViews();
         if (pages[selectedPage] != null) {

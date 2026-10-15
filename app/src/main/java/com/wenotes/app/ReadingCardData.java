@@ -45,6 +45,38 @@ final class ReadingCardData {
         }
     }
 
+    static final class Comparison {
+        final Week current;
+        final Week previous;
+        final int elapsedDays;
+        int biggestChangeDay = -1;
+
+        Comparison(ReadingStatistics statistics, LocalDate today) {
+            current = new Week(statistics, today);
+            previous = new Week(statistics, today.minusWeeks(1));
+            elapsedDays = today.getDayOfWeek().getValue();
+            for (int i = 0; i < elapsedDays; i++) {
+                Long delta = differenceOn(i);
+                if (delta != null && delta != 0 && (biggestChangeDay < 0
+                        || Math.abs(delta) > Math.abs(differenceOn(biggestChangeDay)))) biggestChangeDay = i;
+            }
+        }
+
+        boolean complete() { return current.complete() && previous.complete(); }
+
+        Long differenceSeconds() { return complete() ? current.totalSeconds - previous.totalSeconds : null; }
+
+        Double changePercent() {
+            return !complete() || previous.totalSeconds == 0 ? null
+                    : (current.totalSeconds - previous.totalSeconds) * 100.0 / previous.totalSeconds;
+        }
+
+        Long differenceOn(int day) {
+            Long now = current.seconds[day], before = previous.seconds[day];
+            return now == null || before == null ? null : now - before;
+        }
+    }
+
     static List<ShelfBook> recentBooks(List<ShelfBook> books, long now) {
         List<ShelfBook> recent = new ArrayList<>();
         for (ShelfBook book : books) {
@@ -56,6 +88,10 @@ final class ReadingCardData {
     }
 
     static List<BookNote> recentNotes(List<BookNote> notes, long now) {
+        return recentNotes(notes, now, 3);
+    }
+
+    static List<BookNote> recentNotes(List<BookNote> notes, long now, int limit) {
         List<BookNote> recent = new ArrayList<>();
         for (BookNote note : notes) {
             if (note.createdAt <= 0 || note.createdAt > now || preview(note).isEmpty()) continue;
@@ -64,7 +100,7 @@ final class ReadingCardData {
         }
         recent.sort(Comparator.comparingLong((BookNote note) -> note.createdAt).reversed()
                 .thenComparing(note -> note.bookId).thenComparing(note -> note.id));
-        return new ArrayList<>(recent.subList(0, Math.min(3, recent.size())));
+        return new ArrayList<>(recent.subList(0, Math.min(limit, recent.size())));
     }
 
     static String preview(BookNote note) {

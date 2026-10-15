@@ -70,7 +70,7 @@ public final class SyncWorker extends Worker {
                     message -> store.setStatus(message, generation)).fetch();
             ReadingStatistics statistics = store.readLibrary().readingStatistics;
             boolean statisticsUpdated = false;
-            store.setStatus("正在同步本周的阅读统计…", generation);
+            store.setStatus("正在同步本周和上周的阅读统计…", generation);
             try {
                 statistics = ReadingStatistics.fetch(api, Instant.now().getEpochSecond(), ZoneId.systemDefault(),
                         () -> isStopped() || generation != store.generation());

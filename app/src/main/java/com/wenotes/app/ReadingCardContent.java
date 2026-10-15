@@ -18,6 +18,7 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -31,16 +32,112 @@ final class ReadingCardContent extends LinearLayout {
     private final List<Runnable> coverBindings = new ArrayList<>();
 
     ReadingCardContent(Context context, int page, LibrarySnapshot library, long now, CoverLoader covers) {
+        this(context, page, library, now, covers, false);
+    }
+
+    ReadingCardContent(Context context, int page, LibrarySnapshot library, long now, CoverLoader covers,
+                       boolean expanded) {
         super(context);
         setOrientation(VERTICAL);
         setPaddingRelative(dp(16), dp(20), dp(16), dp(16));
         LocalDate today = Instant.ofEpochSecond(now).atZone(ZoneId.systemDefault()).toLocalDate();
-        if (page == 0) rhythm(library.readingStatistics, today);
+        if (page == 0 && expanded) comparison(library.readingStatistics, today);
+        else if (page == 0) rhythm(library.readingStatistics, today);
         else if (page == 1) recentBooks(library, now, today, covers);
-        else timeline(library, now, today);
+        else timeline(library, now, today, expanded);
     }
 
     void refreshCovers() { for (Runnable binding : coverBindings) binding.run(); }
+
+    private void comparison(ReadingStatistics statistics, LocalDate today) {
+        setPaddingRelative(dp(20), dp(24), dp(20), dp(24));
+        ReadingCardData.Comparison comparison = new ReadingCardData.Comparison(statistics, today);
+        ReadingCardData.Week current = comparison.current, previous = comparison.previous;
+        LinearLayout hero = row();
+        hero.addView(text(current.knownDays == 0 ? "—" : duration(current.totalSeconds),
+                30, R.color.text_primary, true), new LayoutParams(0, LayoutParams.WRAP_CONTENT, 1));
+        TextView badge = text(comparisonBadge(comparison), 13, R.color.primary, true);
+        badge.setBackground(background(getContext(), R.color.surface_tint, 10));
+        badge.setPadding(dp(10), dp(8), dp(10), dp(8));
+        LayoutParams badgeParams = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+        badgeParams.setMarginStart(dp(8));
+        hero.addView(badge, badgeParams);
+        addView(hero, spaced(0));
+        Long difference = comparison.differenceSeconds();
+        String change = difference == null ? getContext().getString(R.string.reading_comparison_pending)
+                : difference == 0 ? getContext().getString(R.string.reading_comparison_equal)
+                : getContext().getString(difference > 0 ? R.string.reading_comparison_more
+                        : R.string.reading_comparison_less, duration(Math.abs(difference)));
+        addView(text(change, 13, R.color.text_secondary, false), spaced(10));
+        LinearLayout legend = row();
+        legend.addView(text(getContext().getString(R.string.reading_comparison_unit), 10,
+                R.color.text_secondary, false), new LayoutParams(0, LayoutParams.WRAP_CONTENT, 1));
+        legend.addView(text("● " + getContext().getString(R.string.reading_comparison_previous),
+                10, R.color.text_secondary, false));
+        TextView currentLegend = text("● " + getContext().getString(R.string.reading_comparison_current),
+                10, R.color.primary, false);
+        currentLegend.setPaddingRelative(dp(10), 0, 0, 0);
+        legend.addView(currentLegend);
+        addView(legend, spaced(24));
+        ReadingComparisonChart chart = new ReadingComparisonChart(getContext(), comparison);
+        StringBuilder description = new StringBuilder();
+        for (int i = 0; i < comparison.elapsedDays; i++) {
+            if (i > 0) description.append("；");
+            description.append(getContext().getString(R.string.reading_comparison_chart_day,
+                    WEEKDAYS[i], knownDuration(current.seconds[i]), knownDuration(previous.seconds[i])));
+        }
+        chart.setContentDescription(description);
+        chart.setImportantForAccessibility(IMPORTANT_FOR_ACCESSIBILITY_YES);
+        addView(chart, spaced(10));
+        LinearLayout totals = row();
+        totals.setGravity(Gravity.TOP);
+        totals.setBaselineAligned(false);
+        totals.addView(comparisonTotal(previous, previous.complete() ? R.string.reading_comparison_previous
+                : R.string.reading_comparison_previous_partial), new LayoutParams(0, LayoutParams.WRAP_CONTENT, 1));
+        LayoutParams currentParams = new LayoutParams(0, LayoutParams.WRAP_CONTENT, 1);
+        currentParams.setMarginStart(dp(8));
+        totals.addView(comparisonTotal(current, current.complete() ? R.string.reading_comparison_current_total
+                : R.string.reading_comparison_current_partial), currentParams);
+        addView(totals, spaced(20));
+        if (comparison.biggestChangeDay >= 0) {
+            int day = comparison.biggestChangeDay;
+            long delta = comparison.differenceOn(day);
+            TextView insight = text(getContext().getString(delta > 0 ? R.string.reading_comparison_day_more
+                    : R.string.reading_comparison_day_less, WEEKDAYS[day], duration(Math.abs(delta))),
+                    14, R.color.primary, true);
+            insight.setBackground(background(getContext(), R.color.surface_tint, 12));
+            insight.setPadding(dp(12), dp(14), dp(12), dp(14));
+            addView(insight, spaced(10));
+        }
+    }
+
+    private LinearLayout comparisonTotal(ReadingCardData.Week week, int label) {
+        LinearLayout panel = metric(week.knownDays == 0 ? "—" : duration(week.totalSeconds), label);
+        panel.setPadding(dp(12), dp(14), dp(12), dp(14));
+        panel.setBackground(background(getContext(), R.color.background, 12));
+        DateTimeFormatter format = DateTimeFormatter.ofPattern("MM.dd", Locale.CHINA);
+        panel.addView(text(format.format(week.monday) + " – " + format.format(week.today),
+                10, R.color.text_secondary, false), spaced(8));
+        return panel;
+    }
+
+    private String knownDuration(Long seconds) {
+        return seconds == null ? getContext().getString(R.string.reading_unknown) : duration(seconds);
+    }
+
+    private String comparisonBadge(ReadingCardData.Comparison comparison) {
+        Long delta = comparison.differenceSeconds();
+        if (delta == null) return getContext().getString(R.string.reading_comparison_waiting);
+        if (delta == 0) return getContext().getString(R.string.reading_comparison_unchanged);
+        Double percent = comparison.changePercent();
+        if (percent == null) return getContext().getString(R.string.reading_comparison_new);
+        if (Math.abs(percent) < 1) return getContext().getString(percent > 0
+                ? R.string.reading_comparison_small_increase : R.string.reading_comparison_small_decrease);
+        NumberFormat format = NumberFormat.getNumberInstance(Locale.CHINA);
+        format.setGroupingUsed(false);
+        format.setMaximumFractionDigits(1);
+        return (percent > 0 ? "+" : "−") + format.format(Math.abs(percent)) + "%";
+    }
 
     private void rhythm(ReadingStatistics statistics, LocalDate today) {
         ReadingCardData.Week week = new ReadingCardData.Week(statistics, today);
@@ -135,8 +232,8 @@ final class ReadingCardContent extends LinearLayout {
         refreshCovers();
     }
 
-    private void timeline(LibrarySnapshot library, long now, LocalDate today) {
-        List<BookNote> notes = ReadingCardData.recentNotes(library.notes, now);
+    private void timeline(LibrarySnapshot library, long now, LocalDate today, boolean expanded) {
+        List<BookNote> notes = ReadingCardData.recentNotes(library.notes, now, expanded ? 30 : 3);
         if (notes.isEmpty()) {
             message(library.complete ? R.string.reading_no_notes : R.string.reading_notes_pending);
             return;
@@ -176,8 +273,10 @@ final class ReadingCardContent extends LinearLayout {
             title.setEllipsize(TextUtils.TruncateAt.END);
             content.addView(title, spaced(6));
             TextView preview = text(ReadingCardData.preview(note), 12, R.color.text_secondary, false);
-            preview.setMaxLines(2);
-            preview.setEllipsize(TextUtils.TruncateAt.END);
+            if (!expanded) {
+                preview.setMaxLines(2);
+                preview.setEllipsize(TextUtils.TruncateAt.END);
+            }
             preview.setBackground(background(getContext(), R.color.background, 10));
             preview.setPadding(dp(10), dp(9), dp(10), dp(9));
             content.addView(preview, spaced(7));
