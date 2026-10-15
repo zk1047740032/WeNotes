@@ -1,15 +1,15 @@
 {
   "schema": 1,
-  "revision": 8,
+  "revision": 9,
   "app": {
-    "versionCode": 9,
-    "versionName": "1.2.6",
+    "versionCode": 10,
+    "versionName": "1.2.7",
     "updateUrl": "https://github.com/zk1047740032/WeNotes/releases",
-    "releaseNotes": "应用图标更正为选定的蓝底白色书页与引号设计，使用原始图稿，并适配 Android 桌面的圆形和圆角图标。",
+    "releaseNotes": "- 收藏句子时，以简洁的「金边掠光」动画替代成功弹窗，并自然切换到下一句。\n- 已收藏的句子可再次右滑取消收藏。\n- 长按句子可生成分享图，支持「黑白大字」和「蓝色杂志」两种样式，并保存到相册。\n- 点击阅读统计中的书籍，可直接进入对应的书籍笔记。",
     "apk": {
-      "url": "https://github.com/zk1047740032/WeNotes/releases/download/v1.2.6/WeNotes-1.2.6.apk",
-      "size": 3292500,
-      "sha256": "9859211e7859d3a7e546ede33f22eb26caa784bd049cfddb2ba9b98d7d852b44",
+      "url": "https://github.com/zk1047740032/WeNotes/releases/download/v1.2.7/WeNotes-1.2.7.apk",
+      "size": 3304152,
+      "sha256": "a329b608665205d2ebedced6f5bc7164f7fc606324dc8764ca033e22d3c0fed9",
       "signerSha256": "7fa56310217debfb9b53b33c7c944be31eee842bfe53f8cbe0eea777aa3a69e5"
     }
   },
