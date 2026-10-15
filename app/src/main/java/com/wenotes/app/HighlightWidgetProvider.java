@@ -53,10 +53,11 @@ public final class HighlightWidgetProvider extends AppWidgetProvider {
         if (highlights.isEmpty()) {
             boolean hasKey = new SecretStore(context).hasKey();
             String status = store.status();
+            String appName = context.getString(R.string.app_name);
             views.setTextViewText(R.id.widget_quote, !hasKey
-                    ? "打开拾句，连接微信读书。"
+                    ? "打开 " + appName + "，连接微信读书。"
                     : status.startsWith("同步完成") ? "还没有可显示的划线。"
-                    : status.startsWith("同步失败") ? "同步失败，打开拾句查看原因。"
+                    : status.startsWith("同步失败") ? "同步失败，打开 " + appName + " 查看原因。"
                     : "正在同步你的划线…");
             views.setTextViewText(R.id.widget_book, hasKey ? status : "点击组件开始设置");
             views.setTextViewText(R.id.widget_count, "");

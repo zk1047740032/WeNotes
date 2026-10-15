@@ -26,7 +26,6 @@ import java.util.Map;
 
 public final class BookshelfActivity extends LibraryActivity {
     private static final int RECENT = 0;
-    private static final int NOTEBOOKS = 1;
     private static final int FAVORITES = 2;
     private final List<ShelfBook> visibleBooks = new ArrayList<>();
     private final BookAdapter adapter = new BookAdapter();
@@ -45,6 +44,7 @@ public final class BookshelfActivity extends LibraryActivity {
         super.onCreate(state);
         setContentView(R.layout.activity_bookshelf);
         selectedTab = state == null ? RECENT : state.getInt("selected_tab", RECENT);
+        if (selectedTab != FAVORITES) selectedTab = RECENT;
         if (state != null) {
             int period = state.getInt("selected_period", 0);
             RecentReading.Period[] periods = RecentReading.Period.values();
@@ -66,7 +66,6 @@ public final class BookshelfActivity extends LibraryActivity {
                     .putExtra("book_title", book.title));
         });
         findViewById(R.id.recent_tab).setOnClickListener(view -> selectTab(RECENT));
-        findViewById(R.id.notebooks_tab).setOnClickListener(view -> selectTab(NOTEBOOKS));
         findViewById(R.id.favorites_tab).setOnClickListener(view -> selectTab(FAVORITES));
         findViewById(R.id.recent_week).setOnClickListener(view -> selectPeriod(RecentReading.Period.WEEK));
         findViewById(R.id.recent_month).setOnClickListener(view -> selectPeriod(RecentReading.Period.MONTH));
@@ -119,14 +118,14 @@ public final class BookshelfActivity extends LibraryActivity {
         visibleBooks.clear();
         int total = 0;
         for (ShelfBook book : candidates) {
-            if (selectedTab == NOTEBOOKS && book.noteCount() == 0) continue;
+            if (book.noteCount() <= 0) continue;
             total++;
             if (query.isEmpty() || (book.title + " " + book.author).toLowerCase(Locale.ROOT).contains(query)) {
                 visibleBooks.add(book);
             }
         }
         String count = selectedTab == RECENT ? getString(R.string.recent_total, periodLabel(), total)
-                : getString(selectedTab == FAVORITES ? R.string.favorites_total : R.string.notebooks_total, total);
+                : getString(R.string.favorites_total, total);
         summary.setText(selectedTab == RECENT && snapshot.complete && !snapshot.recentReadingAvailable
                 ? getString(R.string.recent_reading_unavailable)
                 : query.isEmpty() ? count : getString(R.string.filtered_count, count, visibleBooks.size()));
@@ -138,13 +137,10 @@ public final class BookshelfActivity extends LibraryActivity {
             empty.setText(R.string.sync_recent_reading_first);
         } else {
             empty.setText(!query.isEmpty() ? getString(R.string.no_matching_books)
-                    : selectedTab == NOTEBOOKS ? getString(R.string.no_notebooks)
                     : getString(R.string.no_recent_books, periodLabel()));
         }
         Button recentTab = findViewById(R.id.recent_tab);
-        Button notesTab = findViewById(R.id.notebooks_tab);
         styleTab(recentTab, selectedTab == RECENT);
-        styleTab(notesTab, selectedTab == NOTEBOOKS);
         styleTab(findViewById(R.id.favorites_tab), selectedTab == FAVORITES);
         findViewById(R.id.recent_periods).setVisibility(selectedTab == RECENT ? View.VISIBLE : View.GONE);
         styleTab(findViewById(R.id.recent_week), selectedPeriod == RecentReading.Period.WEEK);

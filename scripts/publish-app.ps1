@@ -74,7 +74,7 @@ try {
     if ($LASTEXITCODE -ne 0 -or -not ($package | Where-Object { $_ -match ("^package: name='com.wenotes.app' versionCode='$newCode' versionName='$([regex]::Escape($VersionName))'") })) { throw 'APK package/version verification failed.' }
     $releaseDirectory = Join-Path $repoRoot ('output\releases\' + $tag)
     New-Item -ItemType Directory -Path $releaseDirectory -Force | Out-Null
-    $assetName = 'WeNotes-' + $VersionName + '.apk'
+    $assetName = 'WeNote-' + $VersionName + '.apk'
     $releaseApk = Join-Path $releaseDirectory $assetName
     Copy-Item -LiteralPath $apkPath -Destination $releaseApk -Force
     $hash = (Get-FileHash -LiteralPath $releaseApk -Algorithm SHA256).Hash.ToLowerInvariant()
@@ -111,7 +111,7 @@ try {
     $commit = (git rev-parse HEAD).Trim()
     if ($existing) { $draft = $existing }
     else {
-        $body = @{ tag_name = $tag; target_commitish = $commit; name = 'WeNotes ' + $VersionName; body = $notes; draft = $true; prerelease = $false } | ConvertTo-Json
+        $body = @{ tag_name = $tag; target_commitish = $commit; name = 'WeNote ' + $VersionName; body = $notes; draft = $true; prerelease = $false } | ConvertTo-Json
         $draft = Invoke-RestMethod -Method Post -Uri ($api + '/releases') -Headers $headers -ContentType 'application/json; charset=utf-8' -Body ([System.Text.Encoding]::UTF8.GetBytes($body)) -TimeoutSec 30
     }
     if ($draft.target_commitish -ne $commit) { throw 'An existing draft targets different source code. Delete or repair the draft before retrying.' }

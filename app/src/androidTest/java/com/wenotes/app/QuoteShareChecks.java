@@ -67,23 +67,34 @@ final class QuoteShareChecks {
         Activity screen = null;
         try {
             instrumentation.waitForIdleSync();
-            onMain(() -> {
-                try {
-                    // Fixture is in memory only; leave the user's library and credentials untouched.
-                    Field current = MainActivity.class.getDeclaredField("currentHighlight");
-                    current.setAccessible(true);
-                    current.set(home, new Highlight("share-check", "share-book", "故乡", "鲁迅", "", TEXT, "", "", 0, 0));
-                    TextView quote = home.findViewById(R.id.current_quote);
-                    quote.setText(TEXT);
-                } catch (ReflectiveOperationException error) { throw new AssertionError(error); }
-            });
-            instrumentation.waitForIdleSync();
-            int[] position = new int[2];
-            onMain(() -> home.findViewById(R.id.current_quote).getLocationOnScreen(position));
-            long down = SystemClock.uptimeMillis();
-            sendTouch(down, MotionEvent.ACTION_DOWN, position[0] + 32, position[1] + 32);
-            SystemClock.sleep(ViewConfiguration.getLongPressTimeout() + 250L);
-            sendTouch(down, MotionEvent.ACTION_UP, position[0] + 32, position[1] + 32);
+            Instrumentation.ActivityMonitor bookMonitor = instrumentation.addMonitor(
+                    BookNotesActivity.class.getName(), null, false);
+            try {
+                for (int target : new int[]{R.id.current_cover, R.id.current_book, R.id.current_chapter}) {
+                    bindFixture(home);
+                    longPress(home, target);
+                    Activity book = bookMonitor.waitForActivityWithTimeout(5000);
+                    require(book instanceof BookNotesActivity, "Long-press on "
+                            + context.getResources().getResourceEntryName(target) + " did not open book notes");
+                    try {
+                        require("share-book".equals(book.getIntent().getStringExtra("book_id")),
+                                "Book header opened notes for a different book");
+                        require("故乡".equals(book.getIntent().getStringExtra("book_title")),
+                                "Book header lost the current book title");
+                        require(!book.getIntent().getBooleanExtra("favorite_notes", false),
+                                "Book header opened global favorites instead of the shelf book page");
+                        require(monitor.getHits() == 0, "Book header also opened the share preview");
+                        count++;
+                    } finally {
+                        onMain(book::finish);
+                    }
+                    instrumentation.waitForIdleSync();
+                }
+            } finally {
+                instrumentation.removeMonitor(bookMonitor);
+            }
+            bindFixture(home);
+            longPress(home, R.id.current_quote);
             screen = instrumentation.waitForMonitorWithTimeout(monitor, 5000);
             require(screen instanceof QuoteShareActivity, "Long-press on selectable text did not open the share preview");
             count++;
@@ -138,6 +149,41 @@ final class QuoteShareChecks {
             onMain(() -> { if (closing != null) closing.finish(); home.finish(); });
         }
         return count;
+    }
+
+    private void bindFixture(Activity home) throws Throwable {
+        long deadline = SystemClock.uptimeMillis() + 10000;
+        boolean[] focused = new boolean[1];
+        do {
+            onMain(() -> focused[0] = home.hasWindowFocus());
+            if (!focused[0]) SystemClock.sleep(50);
+        } while (!focused[0] && SystemClock.uptimeMillis() < deadline);
+        require(focused[0], "Home window did not regain focus before the long-press");
+        onMain(() -> {
+            try {
+                // Fixture is in memory only; leave the user's library and credentials untouched.
+                Field current = MainActivity.class.getDeclaredField("currentHighlight");
+                current.setAccessible(true);
+                current.set(home, new Highlight("share-check", "share-book", "故乡", "鲁迅", "", TEXT, "", "", 0, 0));
+                TextView quote = home.findViewById(R.id.current_quote);
+                quote.setText(TEXT);
+                home.findViewById(R.id.current_book_panel).setVisibility(View.VISIBLE);
+                ((TextView) home.findViewById(R.id.current_book)).setText("《故乡》");
+                TextView chapter = home.findViewById(R.id.current_chapter);
+                chapter.setText("测试章节");
+                chapter.setVisibility(View.VISIBLE);
+            } catch (ReflectiveOperationException error) { throw new AssertionError(error); }
+        });
+        instrumentation.waitForIdleSync();
+    }
+
+    private void longPress(Activity home, int target) throws Throwable {
+        int[] position = new int[2];
+        onMain(() -> home.findViewById(target).getLocationOnScreen(position));
+        long down = SystemClock.uptimeMillis();
+        sendTouch(down, MotionEvent.ACTION_DOWN, position[0] + 32, position[1] + 32);
+        SystemClock.sleep(ViewConfiguration.getLongPressTimeout() + 250L);
+        sendTouch(down, MotionEvent.ACTION_UP, position[0] + 32, position[1] + 32);
     }
 
     private void awaitPreview(Activity activity, int style) throws Throwable {

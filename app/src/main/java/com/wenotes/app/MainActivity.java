@@ -4,7 +4,12 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.text.LineBreaker;
+import android.os.Build;
 import android.os.Bundle;
+import android.text.SpannableString;
+import android.text.Spanned;
+import android.text.style.LeadingMarginSpan;
 import android.view.View;
 import android.view.accessibility.AccessibilityNodeInfo;
 import android.widget.ImageView;
@@ -57,12 +62,13 @@ public final class MainActivity extends Activity {
         ((TextView) nextCard.findViewById(R.id.current_quote)).setTextIsSelectable(false);
         ((TextView) nextCard.findViewById(R.id.current_thought)).setTextIsSelectable(false);
         quoteCard.setOnLongClickListener(view -> shareQuote());
+        quoteCard.findViewById(R.id.current_book_panel).setOnLongClickListener(view -> openQuoteBook());
         quoteCard.findViewById(R.id.current_quote).setOnLongClickListener(view -> shareQuote());
         quoteCard.findViewById(R.id.current_thought).setOnLongClickListener(view -> shareQuote());
         quoteCard.setSwipeListener(new QuoteCardLayout.SwipeListener() {
             @Override
             public boolean onBeforeSwipe(boolean left) {
-                return left || toggleQuoteFavorite();
+                return updateQuoteFavoriteForSwipe(left);
             }
 
             @Override
@@ -87,10 +93,10 @@ public final class MainActivity extends Activity {
             @Override
             public boolean performAccessibilityAction(View host, int action, Bundle arguments) {
                 if (currentHighlight != null && action == R.id.action_next_quote) {
-                    return quoteCard.performSwipe(true);
+                    return quoteCard.performSwipe(!quoteCard.isActivated());
                 }
                 if (currentHighlight != null && action == R.id.action_favorite_quote) {
-                    return quoteCard.performSwipe(false);
+                    return quoteCard.performSwipe(quoteCard.isActivated());
                 }
                 return super.performAccessibilityAction(host, action, arguments);
             }
@@ -157,17 +163,18 @@ public final class MainActivity extends Activity {
         refreshUi();
     }
 
-    private boolean toggleQuoteFavorite() {
+    private boolean updateQuoteFavoriteForSwipe(boolean left) {
         if (currentHighlight == null) return false;
         try {
             FavoriteNote favorite = FavoriteNote.fromHighlight(currentHighlight, cachedLibrary);
             boolean saved = favoriteStore.read().containsKey(FavoriteNote.key(favorite.note));
+            if (left != saved) return true;
             if (saved) favoriteStore.toggle(favorite);
             else favoriteStore.add(favorite);
             quoteCard.setActivated(!saved);
+            quoteCard.playFavoriteSweep();
             if (saved) Toast.makeText(this, R.string.quote_removed, Toast.LENGTH_SHORT).show();
             else {
-                quoteCard.playFavoriteSweep();
                 quoteCard.announceForAccessibility(getString(R.string.quote_saved));
             }
             return true;
@@ -175,6 +182,14 @@ public final class MainActivity extends Activity {
             Toast.makeText(this, R.string.favorite_save_failed, Toast.LENGTH_SHORT).show();
             return false;
         }
+    }
+
+    private boolean openQuoteBook() {
+        if (currentHighlight == null || currentHighlight.bookId.isEmpty()) return false;
+        startActivity(new Intent(this, BookNotesActivity.class)
+                .putExtra("book_id", currentHighlight.bookId)
+                .putExtra("book_title", currentHighlight.title));
+        return true;
     }
 
     private boolean shareQuote() {
@@ -238,7 +253,7 @@ public final class MainActivity extends Activity {
             coverView.setImageDrawable(null);
             coverPlaceholder.setText("");
         } else {
-            quoteView.setText(highlight.text);
+            quoteView.setText(formatQuote(highlight.text, quoteView));
             bookPanel.setVisibility(View.VISIBLE);
             bookView.setText(getString(R.string.quote_book, highlight.title));
             chapterView.setText(highlight.chapter);
@@ -255,5 +270,29 @@ public final class MainActivity extends Activity {
                 thoughtPanel.setVisibility(View.VISIBLE);
             }
         }
+    }
+
+    private CharSequence formatQuote(String text, TextView view) {
+        SpannableString formatted = new SpannableString(text);
+        boolean hasChinese = false;
+        int indent = Math.round(view.getPaint().measureText("汉汉"));
+        for (int start = 0; start < text.length();) {
+            int newline = text.indexOf('\n', start);
+            int end = newline < 0 ? text.length() : newline + 1;
+            for (int offset = start; offset < end;) {
+                int codePoint = text.codePointAt(offset);
+                if (Character.UnicodeScript.of(codePoint) == Character.UnicodeScript.HAN) {
+                    hasChinese = true;
+                    formatted.setSpan(new LeadingMarginSpan.Standard(indent, 0),
+                            start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                    break;
+                }
+                offset += Character.charCount(codePoint);
+            }
+            start = end;
+        }
+        view.setJustificationMode(Build.VERSION.SDK_INT >= 35 && hasChinese
+                ? LineBreaker.JUSTIFICATION_MODE_INTER_CHARACTER : LineBreaker.JUSTIFICATION_MODE_INTER_WORD);
+        return formatted;
     }
 }

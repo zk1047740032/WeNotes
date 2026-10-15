@@ -34,6 +34,9 @@
         android:gravity="center_vertical" android:textColor="@color/text_primary"
         android:textSize="18sp" android:fontFamily="sans-serif-medium" android:lineSpacingExtra="9dp"
         android:textIsSelectable="true" />
+    <ImageView android:layout_width="32dp" android:layout_height="32dp"
+        android:layout_gravity="end" android:layout_marginTop="12dp" android:rotation="180"
+        android:src="@drawable/ic_quote" android:importantForAccessibility="no" />
     <LinearLayout android:id="@+id/current_thought_panel" android:layout_width="match_parent"
         android:layout_height="wrap_content" android:layout_marginTop="24dp"
         android:background="@drawable/secondary_button_background" android:orientation="vertical"

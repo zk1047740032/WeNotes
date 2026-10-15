@@ -1,6 +1,6 @@
 # WeNotes 项目协作与发布约定
 
-本文件适用于整个仓库。项目是原生 Java Android 应用「拾句」，包名 `com.wenotes.app`，源码远程为 `https://github.com/zk1047740032/WeNotes.git`，日常维护分支为 `main`。
+本文件适用于整个仓库。项目是原生 Java Android 应用「WeNote」，包名 `com.wenotes.app`，源码远程为 `https://github.com/zk1047740032/WeNotes.git`，日常维护分支为 `main`。
 
 ## 用户指令的含义
 

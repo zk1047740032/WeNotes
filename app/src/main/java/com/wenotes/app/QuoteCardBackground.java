@@ -62,24 +62,26 @@ final class QuoteCardBackground extends Drawable {
     }
 
     @Override public void draw(Canvas canvas) {
-        if (saved) {
+        float rimOpacity = saved ? 1 : sweepProgress >= 0 ? 1 - sweepProgress : 0;
+        if (rimOpacity > 0) {
             // Overlapping translucent strokes soften the outer edge without software blur.
             for (int step = 5; step >= 1; step--) {
                 rim.setStrokeWidth((2 + step * 2) * density);
-                rim.setAlpha(Math.round(alpha * (6 - step) * 0.015f));
+                rim.setAlpha(Math.round(alpha * rimOpacity * (6 - step) * 0.015f));
                 canvas.drawRoundRect(rimBounds, radius - density, radius - density, rim);
             }
         }
         canvas.drawRoundRect(cardBounds, radius, radius, surface);
-        if (saved) {
+        if (rimOpacity > 0) {
             rim.setStrokeWidth(2 * density);
-            rim.setAlpha(alpha);
+            rim.setAlpha(Math.round(alpha * rimOpacity));
             canvas.drawRoundRect(rimBounds, radius - density, radius - density, rim);
         }
-        if (saved && sweepProgress >= 0) {
+        if (sweepProgress >= 0) {
             float fade = Math.min(1, Math.min(sweepProgress, 1 - sweepProgress) * 5);
+            float position = saved ? sweepProgress : 1 - sweepProgress;
             sweepMatrix.setTranslate(cardBounds.left - sweepWidth
-                    + (cardBounds.width() + 2 * sweepWidth) * sweepProgress, 0);
+                    + (cardBounds.width() + 2 * sweepWidth) * position, 0);
             sweep.getShader().setLocalMatrix(sweepMatrix);
             int checkpoint = canvas.save();
             canvas.clipPath(cardClip);

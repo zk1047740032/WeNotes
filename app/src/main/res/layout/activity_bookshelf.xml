@@ -21,8 +21,6 @@
             android:layout_marginTop="4dp" android:orientation="horizontal">
             <Button android:id="@+id/recent_tab" style="@style/ReadingTab" android:layout_width="0dp"
                 android:layout_height="match_parent" android:layout_weight="4" android:text="@string/recent_tab" />
-            <Button android:id="@+id/notebooks_tab" style="@style/ReadingTab" android:layout_width="0dp"
-                android:layout_height="match_parent" android:layout_weight="5" android:text="@string/notebooks_tab" />
             <Button android:id="@+id/favorites_tab" style="@style/ReadingTab" android:layout_width="0dp"
                 android:layout_height="match_parent" android:layout_weight="4" android:text="@string/favorites_tab" />
         </LinearLayout>
