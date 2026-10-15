@@ -1,15 +1,15 @@
 {
   "schema": 1,
-  "revision": 10,
+  "revision": 11,
   "app": {
-    "versionCode": 11,
-    "versionName": "1.2.8",
+    "versionCode": 12,
+    "versionName": "1.2.9",
     "updateUrl": "https://github.com/zk1047740032/WeNotes/releases",
-    "releaseNotes": "- 应用更名为 WeNote，桌面名称、组件和更新提示统一使用新名称，不再附加“微信读书”后缀。\n- 书架仅展示有笔记的书，移除“有笔记的书”分区，保留“最近阅读”和“我的收藏”。\n- 句子卡片补全右引号，放在正文下方靠右，与左引号呼应。\n- 中文正文每段首行缩进两个汉字，英文保持顶格；Android 15 及以上支持完整行两端对齐，末行自然收尾。\n- 长按卡片上方的封面、书名或章节，可进入该书的笔记与收藏页；长按下方句子仍打开分享窗口。\n- 优化滑动时的收藏状态处理，以及收藏和取消收藏时的金边反馈。",
+    "releaseNotes": "- 长按阅读足迹卡片可伸展展开，显示最近 30 条笔记的完整内容，支持上下滑动浏览。\n- 长按阅读时间卡片可查看双周对照：上周在左、本周在右，展示每日时长、同期累计、增减幅度和单日变化。\n- 阅读统计同步补齐上周记录，按两周相同天数比较；数据缺失时显示待同步，正确处理上周零时长的情况。\n- 展开卡片采用浅色毛玻璃背景，保留四周留白；点击外侧或返回键可收起，阅读时间卡片随内容调整高度。",
     "apk": {
-      "url": "https://github.com/zk1047740032/WeNotes/releases/download/v1.2.8/WeNote-1.2.8.apk",
-      "size": 3303504,
-      "sha256": "da1a25cd93d6f783e34010cf21dfa8727524d561e441d725df3976da624e7ec5",
+      "url": "https://github.com/zk1047740032/WeNotes/releases/download/v1.2.9/WeNote-1.2.9.apk",
+      "size": 3319252,
+      "sha256": "9dfeb5ca1907b2daf1013ed5674ac1ba13f425e0df2a34dd028d07256ccc3dc4",
       "signerSha256": "7fa56310217debfb9b53b33c7c944be31eee842bfe53f8cbe0eea777aa3a69e5"
     }
   },
