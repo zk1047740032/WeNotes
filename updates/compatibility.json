@@ -1,15 +1,15 @@
 {
   "schema": 1,
-  "revision": 12,
+  "revision": 13,
   "app": {
-    "versionCode": 13,
-    "versionName": "1.2.10",
+    "versionCode": 14,
+    "versionName": "1.2.11",
     "updateUrl": "https://github.com/zk1047740032/WeNotes/releases",
-    "releaseNotes": "- 移除独立收藏页面及底部收藏入口，底栏保留“阅读、书架、我的”；已有收藏笔记仍可在对应书籍详情中查看。\n- 书籍详情展示简介、分类、阅读进度和阅读时长；笔记支持章节折叠、原文或时间排序，以及按时间正序、倒序查看。\n- 长按书封进入沉浸式笔记阅读，按原文顺序展示划线和想法，支持仿真翻页并记住阅读位置。\n- 双击书封可收藏或取消收藏书籍，已收藏书籍显示金色双线边框；单击书封仍可查看书籍详情。",
+    "releaseNotes": "- 修复书籍详情中阅读时长错误显示为“0时0分”的问题，正确展示实际累计阅读时长。\n- 兼容处理旧版保存的错误时长缓存，联网重新打开书籍详情后获取并显示正确时长。",
     "apk": {
-      "url": "https://github.com/zk1047740032/WeNotes/releases/download/v1.2.10/WeNote-1.2.10.apk",
-      "size": 3357768,
-      "sha256": "178338cd69ff68954f6f8b2f860ce88f73244b519f94c5926def90ff5a10554e",
+      "url": "https://github.com/zk1047740032/WeNotes/releases/download/v1.2.11/WeNote-1.2.11.apk",
+      "size": 3357732,
+      "sha256": "48f0617a485e5123edf29853b187ec309b362f22595c8e00ae772f07962d1f82",
       "signerSha256": "7fa56310217debfb9b53b33c7c944be31eee842bfe53f8cbe0eea777aa3a69e5"
     }
   },
