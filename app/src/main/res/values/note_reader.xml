@@ -1,0 +1,19 @@
+<resources>
+    <color name="reader_paper">#FFFFFF</color>
+    <color name="reader_ink">#25272B</color>
+    <color name="reader_muted">#737B87</color>
+    <color name="reader_rule">#E4E8EE</color>
+    <color name="reader_thought">#3265A5</color>
+    <color name="reader_bubble_outline">#BFD1E9</color>
+    <string name="reader_note">笔记</string>
+    <string name="reader_my_thought">我的想法</string>
+    <item name="note_reader" type="id" />
+    <string name="reader_open">《%1$s》，长按阅读笔记</string>
+    <string name="reader_hint">左右滑动或轻点两侧翻页，轻点中间显示返回</string>
+    <string name="reader_page">%1$d / %2$d</string>
+    <string name="reader_first_page">已是第一页</string>
+    <string name="reader_last_page">已到最后一页</string>
+    <string name="reader_page_description">%1$s，第 %2$d 页，共 %3$d 页。%4$s</string>
+    <string name="reader_previous">上一页</string>
+    <string name="reader_next">下一页</string>
+</resources>

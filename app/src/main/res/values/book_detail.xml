@@ -1,0 +1,27 @@
+<resources>
+    <string name="book_detail_title">书籍详情</string>
+    <string name="book_detail_notes">阅读笔记</string>
+    <string name="book_detail_category_unknown">暂无分类</string>
+    <string name="book_detail_intro_unknown">书籍简介暂未同步</string>
+    <string name="book_detail_expand">展开简介</string>
+    <string name="book_detail_collapse">收起简介</string>
+    <string name="book_detail_progress">阅读进度</string>
+    <string name="book_detail_duration">阅读时长</string>
+    <string name="book_detail_highlights">划线</string>
+    <string name="book_detail_thoughts">笔记 / 想法</string>
+    <string name="book_detail_unknown">—</string>
+    <string name="book_detail_percent">%1$d%%</string>
+    <string name="book_detail_duration_value">%1$d时%2$d分</string>
+    <string name="book_detail_under_minute">不足1分钟</string>
+    <string name="book_detail_source_order">原文顺序</string>
+    <string name="book_detail_time_order">时间顺序</string>
+    <string name="book_detail_newest">最新在前</string>
+    <string name="book_detail_oldest">最早在前</string>
+    <string name="book_detail_source_hint">按章节与原文位置排列</string>
+    <string name="book_detail_time_hint">按记录日期排列 · 同日同章合并</string>
+    <string name="book_detail_group_count">%1$d 条</string>
+    <string name="book_detail_group_expand">展开%1$s，%2$d条笔记</string>
+    <string name="book_detail_group_collapse">收起%1$s，%2$d条笔记</string>
+    <string name="book_detail_unknown_date">记录时间未知</string>
+    <string name="book_detail_progress_description">阅读进度：%1$s</string>
+</resources>

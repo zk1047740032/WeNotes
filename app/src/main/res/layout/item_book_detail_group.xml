@@ -1,0 +1,8 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent" android:layout_height="wrap_content">
+    <LinearLayout android:id="@+id/book_detail_group_body" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal"
+        android:gravity="center_vertical" android:paddingStart="18dp" android:paddingEnd="16dp" android:paddingTop="17dp" android:paddingBottom="15dp" android:minHeight="52dp">
+        <TextView android:id="@+id/book_detail_group_title" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:layout_marginEnd="9dp" android:textSize="12sp" android:lineSpacingExtra="3dp" android:textColor="@color/text_primary" />
+        <TextView android:id="@+id/book_detail_group_count" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textSize="11sp" android:textColor="@color/text_hint" />
+        <ImageView android:id="@+id/book_detail_group_arrow" android:layout_width="20dp" android:layout_height="20dp" android:layout_marginStart="6dp" android:src="@drawable/ic_note_group_chevron" android:importantForAccessibility="no" />
+    </LinearLayout>
+</FrameLayout>

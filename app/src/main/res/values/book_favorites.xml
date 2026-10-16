@@ -1,0 +1,9 @@
+<resources>
+    <item name="action_toggle_book_favorite" type="id" />
+    <string name="book_saved">已收藏</string>
+    <string name="book_unsaved">未收藏</string>
+    <string name="unfavorite_book">取消收藏书籍</string>
+    <string name="book_favorite_saved">已收藏书籍</string>
+    <string name="book_favorite_removed">已取消收藏书籍</string>
+    <string name="book_cover_gestures">《%1$s》，%2$s，单击查看笔记，双击书封%3$s，长按阅读笔记</string>
+</resources>

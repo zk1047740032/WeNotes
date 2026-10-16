@@ -96,10 +96,10 @@ final class LibrarySnapshot {
                     (previous == null ? 0 : previous.reviewCount) + (highlight.thought.isEmpty() ? 0 : 1), 0));
             long order = highlight.chapterUid == 0 ? Long.MAX_VALUE : highlight.chapterUid;
             notes.add(new BookNote(highlight.id, highlight.bookId, "highlight", highlight.chapter,
-                    order, highlight.text, "", highlight.createdAt));
+                    order, highlight.text, "", highlight.createdAt, highlight.range));
             if (!highlight.thought.isEmpty()) {
                 notes.add(new BookNote(highlight.id + ":thought", highlight.bookId, "thought",
-                        highlight.chapter, order, highlight.text, highlight.thought, highlight.createdAt));
+                        highlight.chapter, order, highlight.text, highlight.thought, highlight.createdAt, highlight.range));
             }
         }
         return new LibrarySnapshot(new ArrayList<>(books.values()), notes, highlights, false);

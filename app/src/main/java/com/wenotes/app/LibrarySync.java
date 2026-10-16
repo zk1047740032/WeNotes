@@ -139,7 +139,7 @@ final class LibrarySync {
                 current.add(highlight);
                 notes.put(id, new BookNote(id, book.id, "highlight", chapter,
                         chapterOrder.getOrDefault(uid, uid == 0 ? Long.MAX_VALUE : uid),
-                        text, "", highlight.createdAt));
+                        text, "", highlight.createdAt, highlight.range));
             }
         }
         if (book.reviewCount == 0) return;
@@ -168,6 +168,7 @@ final class LibrarySync {
                     if (quote.isEmpty()) quote = match.text;
                     if (chapter.isEmpty()) chapter = match.chapter;
                     if (uid == 0) uid = match.chapterUid;
+                    if (range.isEmpty()) range = match.range;
                 } else if (!quote.isEmpty()) {
                     output.put(id, new Highlight(id, book.id, book.title, book.author, chapter,
                             quote, thought, range, uid, review.optLong("createTime")));
@@ -176,7 +177,7 @@ final class LibrarySync {
                         : uid != 0 || !chapter.isEmpty() ? "chapter_review" : "review";
                 notes.put(id, new BookNote(id, book.id, kind, chapter,
                         chapterOrder.getOrDefault(uid, uid == 0 ? Long.MAX_VALUE : uid),
-                        quote, thought, review.optLong("createTime")));
+                        quote, thought, review.optLong("createTime"), range));
             }
             if (page.optInt("hasMore") != 1) break;
             long next = page.getLong("synckey");

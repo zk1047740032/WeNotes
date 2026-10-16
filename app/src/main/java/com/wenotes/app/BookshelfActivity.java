@@ -10,7 +10,6 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -185,6 +184,32 @@ public final class BookshelfActivity extends LibraryActivity {
             View view = convertView == null
                     ? LayoutInflater.from(BookshelfActivity.this).inflate(R.layout.item_book, parent, false) : convertView;
             ShelfBook book = getItem(position);
+            BookCoverFrame cover = view.findViewById(R.id.book_cover_frame);
+            boolean saved = favoriteBooks.containsKey(book.id);
+            boolean canFavorite = !"articles".equals(book.kind) && !book.id.isEmpty();
+            cover.setContentDescription(canFavorite ? getString(R.string.book_cover_gestures, book.title,
+                    getString(saved ? R.string.book_saved : R.string.book_unsaved),
+                    getString(saved ? R.string.unfavorite_book : R.string.favorite_book))
+                    : getString(R.string.reader_open, book.title));
+            cover.bindFavorite(book.id, saved,
+                    getString(saved ? R.string.unfavorite_book_description : R.string.favorite_book_description, book.title),
+                    canFavorite ? () -> {
+                        try {
+                            favoriteStore.toggle(book);
+                            showLibrary();
+                            Toast.makeText(BookshelfActivity.this, saved ? R.string.book_favorite_removed
+                                    : R.string.book_favorite_saved, Toast.LENGTH_SHORT).show();
+                        } catch (IllegalStateException error) {
+                            Toast.makeText(BookshelfActivity.this, R.string.favorite_save_failed, Toast.LENGTH_SHORT).show();
+                        }
+                    } : null);
+            cover.setOnClickListener(button -> startActivity(new Intent(BookshelfActivity.this, BookNotesActivity.class)
+                    .putExtra("book_id", book.id).putExtra("book_title", book.title)));
+            cover.setOnLongClickListener(button -> {
+                startActivity(new Intent(BookshelfActivity.this, NoteReaderActivity.class)
+                        .putExtra("book_id", book.id).putExtra("book_title", book.title));
+                return true;
+            });
             TextView placeholder = view.findViewById(R.id.book_badge);
             placeholder.setText(book.title);
             coverLoader.bind((ImageView) view.findViewById(R.id.book_cover), placeholder, book);
@@ -197,20 +222,6 @@ public final class BookshelfActivity extends LibraryActivity {
                     : "articles".equals(book.kind) ? getString(R.string.articles_unavailable)
                     : getString(R.string.shelf_grid_notes, book.noteCount());
             ((TextView) view.findViewById(R.id.book_detail)).setText(detail);
-            ImageButton favorite = view.findViewById(R.id.book_favorite);
-            boolean saved = favoriteBooks.containsKey(book.id);
-            favorite.setVisibility("articles".equals(book.kind) || book.id.isEmpty() ? View.GONE : View.VISIBLE);
-            favorite.setImageResource(saved ? R.drawable.ic_book_favorite : R.drawable.ic_book_favorite_outline);
-            favorite.setContentDescription(getString(saved ? R.string.unfavorite_book_description
-                    : R.string.favorite_book_description, book.title));
-            favorite.setOnClickListener(button -> {
-                try {
-                    favoriteStore.toggle(book);
-                    showLibrary();
-                } catch (IllegalStateException error) {
-                    Toast.makeText(BookshelfActivity.this, R.string.favorite_save_failed, Toast.LENGTH_SHORT).show();
-                }
-            });
             return view;
         }
     }

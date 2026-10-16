@@ -205,6 +205,13 @@ final class ReadingCardContent extends LinearLayout {
             BookCoverFrame frame = new BookCoverFrame(getContext(), null);
             frame.setBackground(background(getContext(), R.color.surface_tint, 6));
             frame.setElevation(dp(1));
+            frame.setContentDescription(getContext().getString(R.string.reader_open, book.title));
+            frame.setOnClickListener(view -> column.performClick());
+            frame.setOnLongClickListener(view -> {
+                getContext().startActivity(new Intent(getContext(), NoteReaderActivity.class)
+                        .putExtra("book_id", book.id).putExtra("book_title", book.title));
+                return true;
+            });
             ImageView image = new ImageView(getContext());
             image.setScaleType(ImageView.ScaleType.FIT_CENTER);
             image.setImportantForAccessibility(IMPORTANT_FOR_ACCESSIBILITY_NO);

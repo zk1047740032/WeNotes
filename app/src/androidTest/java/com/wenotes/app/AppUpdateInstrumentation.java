@@ -35,6 +35,21 @@ public final class AppUpdateInstrumentation extends Instrumentation {
     @Override public void onStart() {
         Bundle result = new Bundle();
         try {
+            if (arguments != null && "true".equals(arguments.getString("bookshelfFavorite"))) {
+                result.putString("stream", "\nPassed " + BookshelfFavoriteChecks.run(this) + " bookshelf favorite checks.\n");
+                finish(Activity.RESULT_OK, result);
+                return;
+            }
+            if (arguments != null && "true".equals(arguments.getString("bookDetail"))) {
+                result.putString("stream", "\nPassed " + BookDetailChecks.run(this) + " book detail checks.\n");
+                finish(Activity.RESULT_OK, result);
+                return;
+            }
+            if (arguments != null && "true".equals(arguments.getString("noteReader"))) {
+                result.putString("stream", "\nPassed " + NoteReaderChecks.run(this) + " note reader checks.\n");
+                finish(Activity.RESULT_OK, result);
+                return;
+            }
             if (arguments != null && "true".equals(arguments.getString("readingComparison"))) {
                 result.putString("stream", "\nPassed " + ReadingComparisonChecks.run(this) + " reading comparison checks.\n");
                 finish(Activity.RESULT_OK, result);

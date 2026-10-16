@@ -14,8 +14,8 @@ import androidx.core.view.WindowInsetsCompat;
 final class AppNavigation {
     static void bind(Activity activity, int selected) {
         applyWindowInsets(activity);
-        int[] items = {R.id.nav_home, R.id.nav_shelf, R.id.nav_favorites, R.id.nav_connection};
-        int[] icons = {R.id.nav_home_icon, R.id.nav_shelf_icon, R.id.nav_favorites_icon, R.id.nav_connection_icon};
+        int[] items = {R.id.nav_home, R.id.nav_shelf, R.id.nav_connection};
+        int[] icons = {R.id.nav_home_icon, R.id.nav_shelf_icon, R.id.nav_connection_icon};
         for (int i = 0; i < items.length; i++) {
             final int destination = i;
             int color = activity.getColor(i == selected ? R.color.primary : R.color.text_secondary);
@@ -29,18 +29,11 @@ final class AppNavigation {
                     return;
                 }
                 if (destination == 0 && activity instanceof MainActivity
-                        || destination == 2 && activity instanceof BookNotesActivity
-                        && ((BookNotesActivity) activity).isGlobalFavorites()
-                        || destination == 3 && activity instanceof ConnectionActivity) return;
-                Class<?> target = destination == 0 ? MainActivity.class : destination == 3
-                        ? ConnectionActivity.class : destination == 2 ? BookNotesActivity.class : BookshelfActivity.class;
-                Intent intent = new Intent(activity, target).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                if (destination == 2) {
-                    // A book's notes may already be on the stack; recreate it in global favorites mode.
-                    intent.putExtra("favorite_notes", true);
-                } else {
-                    intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
-                }
+                        || destination == 2 && activity instanceof ConnectionActivity) return;
+                Class<?> target = destination == 0 ? MainActivity.class : destination == 2
+                        ? ConnectionActivity.class : BookshelfActivity.class;
+                Intent intent = new Intent(activity, target)
+                        .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
                 activity.startActivity(intent);
             });
         }

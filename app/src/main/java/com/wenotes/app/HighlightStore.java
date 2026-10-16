@@ -119,6 +119,7 @@ final class HighlightStore {
             new FavoriteStore(context).clear();
             new NoteFavoriteStore(context).clear();
             CoverLoader.clear(context);
+            context.getSharedPreferences("book_details", Context.MODE_PRIVATE).edit().clear().apply();
             prefs.edit().clear().putLong("generation", nextGeneration).apply();
         }
     }

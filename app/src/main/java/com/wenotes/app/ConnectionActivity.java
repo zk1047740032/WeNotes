@@ -40,7 +40,7 @@ public final class ConnectionActivity extends Activity {
     protected void onCreate(Bundle state) {
         super.onCreate(state);
         setContentView(R.layout.activity_connection);
-        AppNavigation.bind(this, 3);
+        AppNavigation.bind(this, 2);
         keyField = findViewById(R.id.api_key);
         aiKeyField = findViewById(R.id.ai_api_key);
         keyStatus = findViewById(R.id.key_status);

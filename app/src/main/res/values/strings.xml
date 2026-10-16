@@ -3,7 +3,6 @@
     <string name="widget_description">轮播你的微信读书划线和想法</string>
     <string name="nav_home">阅读</string>
     <string name="nav_shelf">书架</string>
-    <string name="nav_favorites">收藏</string>
     <string name="nav_connection">我的</string>
     <string name="home_title">WeNote</string>
     <string name="current_thought_title">我的想法</string>
@@ -61,7 +60,7 @@
     <string name="waiting_sync">等待网络，准备同步书架与笔记…</string>
     <string name="sync_library_first">请在“我的 → 微信读书”中点击“保存并同步”，获取书架和全部笔记。</string>
     <string name="no_matching_books">没有找到匹配的书籍，试试其他书名或作者。</string>
-    <string name="book_note_counts">%1$d 条划线 · %2$d 条想法/点评 · %3$d 个书签</string>
+    <string name="book_note_counts">%1$d 条划线 · %2$d 条想法</string>
     <string name="book_not_cached">本地暂时没有这本书的笔记。</string>
     <string name="notes_loaded">已加载 %1$d 条笔记内容，按章节排列，可长按复制。</string>
     <string name="bookmark_limit">书签仅提供数量，暂不支持查看书签内容。</string>
