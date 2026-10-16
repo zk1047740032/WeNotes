@@ -33,7 +33,8 @@ final class BookDetails {
         JSONObject book = response.optJSONObject("book");
         if (book == null) return this;
         int percentage = book.optInt("progress", -1);
-        long seconds = book.optLong("recordReadingTime", -1);
+        // recordReadingTime is a separate recorded/recitation metric, often zero.
+        long seconds = book.optLong("readingTime", -1);
         return new BookDetails(title, author, cover, intro, category,
                 percentage >= 0 && percentage <= 100 ? percentage : progress,
                 seconds >= 0 ? seconds : readingSeconds);
@@ -42,12 +43,13 @@ final class BookDetails {
     JSONObject toJson() throws JSONException {
         return new JSONObject().put("title", title).put("author", author).put("cover", cover)
                 .put("intro", intro).put("category", category).put("progress", progress)
-                .put("readingSeconds", readingSeconds);
+                .put("readingTime", readingSeconds);
     }
 
     static BookDetails fromJson(JSONObject json) {
+        // Old readingSeconds caches used recordReadingTime, so refresh only that metric.
         return new BookDetails(json.optString("title"), json.optString("author"), json.optString("cover"),
                 json.optString("intro"), json.optString("category"), json.optInt("progress", -1),
-                json.optLong("readingSeconds", -1));
+                json.optLong("readingTime", -1));
     }
 }

@@ -10,6 +10,8 @@ import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import org.json.JSONObject;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.time.Instant;
@@ -48,8 +50,12 @@ final class BookDetailChecks {
 
     private void run() throws Throwable {
         clearFixtureFavorites();
-        BookDetails metadata = new BookDetails("人类大历史", "尤瓦尔·赫拉利", "",
-                "从人类的起源出发，重新理解文明如何走到今天。这是一段用于检查简介展开与收起、文字换行及阅读数据排版的示例内容。沿着认知、农业与科学的线索，回望人类共同走过的漫长旅程。", "历史 · 非虚构", 62, 46080);
+        BookDetails metadata = BookDetails.empty().withInfo(new JSONObject()
+                .put("title", "人类大历史").put("author", "尤瓦尔·赫拉利")
+                .put("intro", "从人类的起源出发，重新理解文明如何走到今天。这是一段用于检查简介展开与收起、文字换行及阅读数据排版的示例内容。沿着认知、农业与科学的线索，回望人类共同走过的漫长旅程。")
+                .put("category", "历史 · 非虚构"))
+                .withProgress(new JSONObject().put("book", new JSONObject()
+                        .put("progress", 62).put("readingTime", 46080).put("recordReadingTime", 0)));
         context.getSharedPreferences("book_details", Context.MODE_PRIVATE).edit().putString(BOOK,
                 metadata.toJson().put("generation", new HighlightStore(context).generation()).toString()).commit();
         context.getSharedPreferences("book_notes_view", Context.MODE_PRIVATE).edit().putBoolean("by_time", false).putBoolean("oldest_first", false).commit();
